@@ -40,7 +40,7 @@ user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hard
 # Random Proxy
 proxy_obj = FreeProxy(rand=True)
 
-def scrape_main_site(github_release_site, headers, proxy):
+def github_scrape(github_release_site, headers, proxy):
     """Scrapes the Snipes site and adds each item to an array
     Args:
         headers (dict): {'User-Agent': ''}

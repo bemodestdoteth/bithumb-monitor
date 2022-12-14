@@ -1,43 +1,27 @@
 import sqlite3
 import os
+import json
 
-coins = [
-    dict(
-        name='EGLD',
-        link='https://github.com/'
-    ),
-]
+with open('./sample_db.json','r') as f:
+    coins = json.loads(f.readline())
 
-columns = [
-    'webhook',
-    'username',
-    'avatar_url',
-    'colour',
-    'delay',
-    'keywords',
-    'proxies',
-    'free_proxy',
-    'details'
-]
-
-def create_config_db():
-    if os.path.isfile('config.db'):
-        con = sqlite3.connect('config.db')
+def create_coins_db():
+    if os.path.isfile('coins.db'):
+        con = sqlite3.connect('coins.db')
     else: # No file
-        con = sqlite3.connect('config.db')
+        con = sqlite3.connect('coins.db')
         cur = con.cursor()
-        cur.execute("create table coins (name, link)")
+        cur.execute("create table coins (name, link, posts)")
         
-        query = "INSERT INTO coins VALUES (?, ?)"
+        query = "INSERT INTO coins VALUES (?, ?, ?)"
 
         for coin in coins:
-            params = [tuple(coin.values())]
+            params = tuple(coin, coin["link"], coin["posts"])
             cur.execute(query, params)
         con.commit()
 
-
 def get_config(coin):
-    con = sqlite3.connect('config.db')
+    con = sqlite3.connect('coins.db')
     cur = con.cursor()
     query = "SELECT * FROM monitors WHERE name = ?"
     params = coin
@@ -48,9 +32,9 @@ def get_config(coin):
     except:
         return None
 
-# 지우고 다시 만드는걸로 수정 필요
+# Need revision, low priority
 def update_config(coin, name=None, link=None, delay=None, details=None):
-    con = sqlite3.connect('config.db')
+    con = sqlite3.connect('coins.db')
     cur = con.cursor()
     query = 'UPDATE monitors SET '
     start = 0
@@ -81,7 +65,7 @@ def update_config(coin, name=None, link=None, delay=None, details=None):
 
 
 def get_all_config():
-    con = sqlite3.connect('config.db')
+    con = sqlite3.connect('coins.db')
     cur = con.cursor()
     item = cur.execute("SELECT * FROM coins;")
     try:
@@ -91,3 +75,5 @@ def get_all_config():
         return items
     except:
         return None
+    
+create_coins_db()

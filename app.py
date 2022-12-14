@@ -76,7 +76,7 @@ def main():
     response = requests.get(url, headers=headers)
     api_n = json.loads(response.text)['data']
 
-    with open('./api.json','r') as f:
+    with open('./status.json','r') as f:
         api_o = json.loads(f.readline())
 
     for key in api_n.keys():
@@ -93,7 +93,7 @@ def main():
             elif api_n[key]['withdrawal_status'] == 1:
                 print('{} withdrawal opened'.format(key))
 
-    #with open('./api.json','w') as f:
+    #with open('./status.json','w') as f:
     #    f.write(json.dumps(api_n))
         
 #main()
