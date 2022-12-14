@@ -19,18 +19,8 @@ import traceback
 import sqlite3
 import os
 
-# Import DB for comparison
-con = sqlite3.connect(os.path.abspath('config.db'))
-cur = con.cursor()
-query = "SELECT * FROM coins WHERE name = ?"
-params = os.path.basename(os.path.dirname(__file__))
-#item = cur.execute(query, params)
-
 # Environment Variables
 load_dotenv()
-
-# Logging Configuration
-logging.basicConfig(filename='{}.log'.format(params), filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
 
 # Configure user agent
 software_names = [SoftwareName.CHROME.value]
@@ -40,57 +30,73 @@ user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hard
 # Random Proxy
 proxy_obj = FreeProxy(rand=True)
 
-def github_scrape(github_release_site, headers, proxy):
+# To-do: add https proxy suppport
+coin = "EGLD"
+proxy = {'http': proxy_obj.get()}
+headers = {'User-Agent': user_agent_rotator.get_random_user_agent()}
+
+# Logging Configuration
+logging.basicConfig(filename='./src/github/github.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
+
+def get_coin(coin):
+    # Import DB to get coin information
+    con = sqlite3.connect(os.path.abspath('coins.db'))
+    cur = con.cursor()
+    # params = os.path.basename(os.path.dirname(__file__))
+    query = "SELECT * FROM coins WHERE name = ?"
+    item = cur.execute(query, (coin,)).fetchone()
+    return {
+        "name": item[0],
+        "link": item[1],
+        "posts": item[2]}
+
+def github_scrape(coin, headers, proxy):
     """Scrapes the Snipes site and adds each item to an array
     Args:
         headers (dict): {'User-Agent': ''}
         proxy (dict): {'http': '', 'https': ''}
     """
-    
-    base_address = 'https://github.com/'
-    items = []
-    
-    # Make request to site
-    s = requests.Session()
-    html = s.get(github_release_site, headers=headers, proxies=proxy, verify=False, timeout=50)
-    soup = BeautifulSoup(html.text, 'html.parser')
-    array = soup.find_all(attrs={'data-test-selector':'release-card'})
-    
-    for i in array:
-        item = {
-            'title' : i.find(class_ = 'Link--primary').text,
-            'link': base_address + i.a['href']
-        }
-        print(item)
-        items.append(item)
 
-    logging.info(msg='Successfully scraped site.')
-    s.close()
-    return items
-
-def checker(item, start):
-    if True:
-        if start == 0:
-            print('send telegram message')
-
-def monitor():
-    """
-    Initiates monitor for github repo
-    """
     print('''
         \n-----------------------------------------
         NOW WATCHING EGLD
         -----------------------------------------\n
         ''')
     logging.info(msg='Successfully started monitor')
+
+    # Get coin infor from database
+    coin_info = get_coin(coin)
     
-    #proxy_https = proxy.replace('http', 'https')
+    # Storing posts
+    base_address = 'https://github.com/'
+    posts = []
     
-    site = 'https://github.com/ElrondNetwork/elrond-go/releases'
-    # To-do: add https proxy suppport
-    proxy = {'http': proxy_obj.get()}
-    headers = {'User-Agent': user_agent_rotator.get_random_user_agent()}
+    # Make request to site
+    s = requests.Session()
+    html = s.get(coin_info["link"], headers=headers, proxies=proxy, verify=False, timeout=50)
+    soup = BeautifulSoup(html.text, 'html.parser')
+    array = soup.find_all(attrs={'data-test-selector':'release-card'})
+
+    latest_post = {
+        'title' : array[0].find(class_ = 'Link--primary').text,
+        'link': base_address + array[0].a['href']
+    }
     
-    scrape_main_site(site, headers, proxy)
-    
-monitor()
+    # First time scraping
+    if coin_info["posts"] == "[]":
+        for i in array:
+            posts.append({
+                'title' : i.find(class_ = 'Link--primary').text,
+                'link': base_address + i.a['href']
+            })
+        posts.reverse()
+        coin_info["posts"] = posts
+    else:
+        latest_post = coin_info["posts"][-1]
+        
+
+    logging.info(msg='Successfully scraped site.')
+    s.close()
+    return posts
+
+github_scrape(coin, headers, proxy)

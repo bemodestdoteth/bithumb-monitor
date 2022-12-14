@@ -6,21 +6,19 @@ with open('./sample_db.json','r') as f:
     coins = json.loads(f.readline())
 
 def create_coins_db():
-    if os.path.isfile('coins.db'):
-        con = sqlite3.connect('coins.db')
-    else: # No file
+    if not(os.path.isfile('coins.db')):
         con = sqlite3.connect('coins.db')
         cur = con.cursor()
         cur.execute("create table coins (name, link, posts)")
         
         query = "INSERT INTO coins VALUES (?, ?, ?)"
 
-        for coin in coins:
-            params = tuple(coin, coin["link"], coin["posts"])
+        for coin in coins.items():
+            params = list((coin[0], coin[1]["link"], coin[1]["posts"]))
             cur.execute(query, params)
         con.commit()
 
-def get_config(coin):
+def get_coin(coin):
     con = sqlite3.connect('coins.db')
     cur = con.cursor()
     query = "SELECT * FROM monitors WHERE name = ?"
@@ -64,7 +62,7 @@ def update_config(coin, name=None, link=None, delay=None, details=None):
         con.commit()
 
 
-def get_all_config():
+def get_all_coins():
     con = sqlite3.connect('coins.db')
     cur = con.cursor()
     item = cur.execute("SELECT * FROM coins;")
