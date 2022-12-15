@@ -1,4 +1,11 @@
+# Environment variable
 .env
+
+# Database file
 coins.db
-status.json
+
+# Log file
 *.log
+
+
+status.json

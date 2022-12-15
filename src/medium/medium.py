@@ -52,7 +52,7 @@ def github_scrape(coin):
         '''.format(coin_info['name']))
         
         # Storing posts
-        base_address = 'https://github.com'
+        base_address = 'https://medium.com'
 
         # Logging Configuration
         logging.basicConfig(filename='./scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
@@ -97,6 +97,6 @@ def github_scrape(coin):
     except Exception as e:
         logging.info(msg = e)
 
-coins = ["EGLD", "THETA", "TFUEL", "TDROP"]
+coins = ["META"]
 for coin in coins:
     github_scrape(coin)

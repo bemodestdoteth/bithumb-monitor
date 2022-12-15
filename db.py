@@ -2,21 +2,31 @@ import sqlite3
 import os
 import json
 
+'''
 with open('./sample_db.json','r') as f:
     coins = json.loads(f.readline())
-
-def create_coins_db():
+'''
+def create_coins_db(coins):
     if not(os.path.isfile('coins.db')):
         con = sqlite3.connect('coins.db')
         cur = con.cursor()
-        cur.execute("create table coins (name, link, posts)")
-        
-        query = "INSERT INTO coins VALUES (?, ?, ?)"
 
-        for coin in coins.items():
-            params = list((coin[0], coin[1]["link"], coin[1]["posts"]))
-            cur.execute(query, params)
+        # Create table
+        cur.execute("CREATE TABLE coins (name PRIMARY KEY, link NOT NULL, posts)")
         con.commit()
+
+        # insert first values
+        insert_coin(coins)
+
+def insert_coin(coins):
+    con = sqlite3.connect('coins.db')
+    cur = con.cursor()
+    query = "INSERT INTO coins VALUES (?, ?, ?)"
+
+    for coin in coins.items():
+        params = list((coin[0], coin[1]["link"], coin[1]["posts"]))
+        cur.execute(query, params)
+    con.commit()
 
 def get_coin(coin):
     con = sqlite3.connect('coins.db')
@@ -73,5 +83,27 @@ def get_all_coins():
         return items
     except:
         return None
-    
-create_coins_db()
+
+coins = {
+    "META": {
+    "link": "https://brunch.co.kr/magazine/metadium-info",
+    "posts": ""
+    },
+    "EGLD": {
+    "link": "https://github.com/ElrondNetwork/elrond-go/releases",
+    "posts": ""
+    },
+    "THETA": {
+    "link": "https://github.com/thetatoken/theta-protocol-ledger/releases",
+    "posts": ""
+    },
+    "TFUEL": {
+    "link": "https://github.com/thetatoken/theta-protocol-ledger/releases",
+    "posts": ""
+    },
+    "TDROP": {
+    "link": "https://github.com/thetatoken/theta-protocol-ledger/releases",
+    "posts": ""
+    }}
+
+create_coins_db(coins)
