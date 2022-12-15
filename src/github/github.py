@@ -85,15 +85,18 @@ def github_scrape(coin):
         if coin_info["posts"] == "":
             logging.info(msg="First time running {} monitor. Inserting latest posts...".format(coin_info["name"]))
             change_post(latest_post, coin)
+            s.close()
+            return None
         elif json.loads(coin_info["posts"]) == latest_post:
             logging.info(msg="{} hasn't updated yet. Moving onto next coin...".format(coin_info["name"]))
+            s.close()
+            return None
         else:
             logging.info(msg="{} has some updates. Now sharing via telegram...".format(coin_info["name"]))
             change_post(latest_post, coin)
-            # Then send some telegram message
-
-        logging.info(msg='Successfully scraped site.')
-        s.close()
+            s.close()
+            # Return post to send telegram message
+            return latest_post
     except Exception as e:
         logging.info(msg = e)
 
