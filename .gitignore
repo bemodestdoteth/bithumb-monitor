@@ -1,3 +1,4 @@
 .env
 coins.db
 status.json
+*.log

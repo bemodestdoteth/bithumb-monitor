@@ -22,22 +22,6 @@ import os
 # Environment Variables
 load_dotenv()
 
-# Configure user agent
-software_names = [SoftwareName.CHROME.value]
-hardware_type = [HardwareType.COMPUTER]
-user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hardware_type)
-
-# Random Proxy
-proxy_obj = FreeProxy(rand=True)
-
-# To-do: add https proxy suppport
-coin = "EGLD"
-proxy = {'http': proxy_obj.get()}
-headers = {'User-Agent': user_agent_rotator.get_random_user_agent()}
-
-# Logging Configuration
-logging.basicConfig(filename='./src/github/github.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
-
 def get_coin(coin):
     # Import DB to get coin information
     con = sqlite3.connect(os.path.abspath('coins.db'))
@@ -49,6 +33,13 @@ def get_coin(coin):
         "name": item[0],
         "link": item[1],
         "posts": item[2]}
+
+def change_post(post, coin):
+    con = sqlite3.connect('coins.db')
+    cur = con.cursor()
+    query = "UPDATE coins SET posts = ? WHERE name = ?"
+    cur.execute(query, (json.dumps(post), coin))
+    con.commit()
 
 def github_scrape(coin, headers, proxy):
     """Scrapes the Snipes site and adds each item to an array
@@ -68,8 +59,7 @@ def github_scrape(coin, headers, proxy):
     coin_info = get_coin(coin)
     
     # Storing posts
-    base_address = 'https://github.com/'
-    posts = []
+    base_address = 'https://github.com'
     
     # Make request to site
     s = requests.Session()
@@ -83,20 +73,33 @@ def github_scrape(coin, headers, proxy):
     }
     
     # First time scraping
-    if coin_info["posts"] == "[]":
-        for i in array:
-            posts.append({
-                'title' : i.find(class_ = 'Link--primary').text,
-                'link': base_address + i.a['href']
-            })
-        posts.reverse()
-        coin_info["posts"] = posts
+    if coin_info["posts"] == "":
+        logging.info(msg="First time running {} monitor. Inserting latest posts...".format(coin_info["name"]))
+        change_post(latest_post, coin)
+    elif coin_info["posts"] == latest_post:
+        logging.info(msg="{} hasn't updated yet. Moving onto next coin...".format(coin_info["name"]))
     else:
-        latest_post = coin_info["posts"][-1]
-        
-
+        logging.info(msg="{} has some updates. Now sharing via telegram...".format(coin_info["name"]))
+        change_post(latest_post, coin)
+        # Then send some telegram message
+    
     logging.info(msg='Successfully scraped site.')
     s.close()
-    return posts
+
+# Configure user agent
+software_names = [SoftwareName.CHROME.value]
+hardware_type = [HardwareType.COMPUTER]
+user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hardware_type)
+
+# Random Proxy
+proxy_obj = FreeProxy(rand=True)
+
+# To-do: add https proxy suppport
+coin = "EGLD"
+proxy = {'http': proxy_obj.get()}
+headers = {'User-Agent': user_agent_rotator.get_random_user_agent()}
+
+# Logging Configuration
+logging.basicConfig(filename='./src/github/github.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
 
 github_scrape(coin, headers, proxy)
