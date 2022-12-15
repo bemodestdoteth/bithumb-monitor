@@ -1,4 +1,0 @@
-2022-12-14 23:26:18,531 - root - Successfully started monitor
-2022-12-14 23:26:18,535 - urllib3.connectionpool - Starting new HTTPS connection (1): github.com:443
-2022-12-14 23:26:19,400 - urllib3.connectionpool - https://github.com:443 "GET /ElrondNetwork/elrond-go/releases HTTP/1.1" 200 None
-2022-12-14 23:26:19,586 - root - Successfully scraped site.
