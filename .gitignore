@@ -7,5 +7,5 @@ coins.db
 # Log file
 *.log
 
-
+test.py
 status.json
