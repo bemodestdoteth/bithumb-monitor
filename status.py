@@ -1,21 +1,13 @@
-# Random user agents to deceive server
-from random_user_agent.user_agent import UserAgent
-from random_user_agent.params import SoftwareName, HardwareType, OperatingSystem
-
 from datetime import datetome
-import time
 
 # FreeProxy for preventing IP ban
 from fp.fp import FreeProxy
 from pybithumb import Bithumb
 import requests
 
-
 from dotenv import load_dotenv
 import json
 import logging
-import traceback
-import sqlite3
 import os
 
 # Logging Configuration
