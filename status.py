@@ -47,7 +47,6 @@ def maesoo(coin):
     # Buy Coin
     result = bithumb.buy_market_order(coin, amount, 'KRW')
     print(result)
-
 def maedo(coin):
     bithumb = Bithumb(os.environ['BITHUMB_CONNECT_KEY'], os.environ['BITHUMB_SECRET_KEY'])
 
@@ -62,6 +61,12 @@ def maedo(coin):
         print(result)
     else:
         print('You don\'t hane {} in your balances. Skipping selling...'.format(coin))
+def get_ticker():
+    tickers = {}
+    omits = ['BTC', 'ETH', 'XRP', 'BCH', 'EOS', 'TRX']
+    tickers["KRW"] = Bithumb.get_tickers('KRW')
+    tickers["BTC"] = list((btc_ticker for btc_ticker in Bithumb.get_tickers('btc') if btc_ticker not in tickers['KRW']))
+    return tickers
 def get_status():
     url = "https://api.bithumb.com/public/assetsstatus/ALL"
     headers = {"accept": "application/json"}
@@ -100,6 +105,7 @@ def get_status():
             break
 
 try:
-    get_status()
+    print(get_ticker())
+    #get_status()
 except Exception as e:
     print(e)

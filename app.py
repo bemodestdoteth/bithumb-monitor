@@ -8,6 +8,7 @@ import os
 
 load_dotenv()
 
-with ThreadPoolExecutor(max_workers=2) as executor:
-    status_thread = threading.Thread(target=get_status, name='Get deposit and withdraw status from bithumb,')
-    update_thread = threading.Thread(target=get_update, name='Get latest coin network update from its dev site.')
+if __name__ == "__main__":
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        #status_thread = threading.Thread(target=get_status, name='Get deposit and withdraw status from bithumb,')
+        #update_thread = threading.Thread(target=get_update, name='Get latest coin network update from its dev site.')

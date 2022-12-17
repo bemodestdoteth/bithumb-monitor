@@ -3,21 +3,30 @@ from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import SoftwareName, HardwareType, OperatingSystem
 
 # FreeProxy for preventing IP ban
-from bs4 import BeautifulSoup
 from fp.fp import FreeProxy
-import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium_config import os_selection
 
-from db import get_coin, change_post
+#from status import get_ticker
 from dotenv import load_dotenv
 import json
 import logging
-import sqlite3
 import os
+import sys
+import time
+
+# Adding system path for import
 
 # Environment Variables
 load_dotenv()
 
-def github_scrape(coin):
+url = "https://xangle.io/insight/disclosure?category=token_swap"
+
+def xangle_token_swap_scrape(coin):
     '''
     Scrapes the site change database accordingly
     
@@ -26,19 +35,17 @@ def github_scrape(coin):
     '''
     try:
         # Get coin infor from database
-        coin_info = get_coin(coin)
-
         print('''
         \n-----------------------------------------
-        NOW WATCHING {}\n-----------------------------------------\n
-        '''.format(coin_info['name']))
+        NOW WATCHING XANGLE TOKEN SWAP DISCLOSURE\n-----------------------------------------\n
+        ''')
         
         # Storing posts
-        base_address = 'https://github.com'
+        base_address = 'https://xangle.io'
 
         # Logging Configuration
         logging.basicConfig(filename='./log/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
-        logging.info(msg='Now monitoring {}'.format(coin_info['name']))
+        logging.info(msg='Now monitoring xangle token swap disclosure...')
 
         # Configure user agent
         software_names = [SoftwareName.CHROME.value]
@@ -52,15 +59,17 @@ def github_scrape(coin):
         proxy = {'http': proxy_obj.get()}
         headers = {'User-Agent': user_agent_rotator.get_random_user_agent()}
 
-        # Make request to site
-        s = requests.Session()
+        # Open driver and
+        driver = os_selection()
+        driver.get(url)
         
-        html = s.get(coin_info["link"], headers=headers, proxies=proxy, verify=False, timeout=50)
+        '''
         soup = BeautifulSoup(html.text, 'html.parser')
+        print(soup.find_all(True))
     
         # With 'latest' tag
         latest_release = {
-            'title' : soup.find('h1', attrs={"data-view-component": "true"}).text,
+            'title' : soup.find(class_=".bc-insight-list-item-area").text,
             'link': base_address + soup.select('li.breadcrumb-item a[aria-current="page"]')[0]['href']
             #'title' : soup.find(class_ = 'Link--primary').text,
             #'link': base_address + soup.a['href']
@@ -82,9 +91,20 @@ def github_scrape(coin):
             s.close()
             # Return post to send telegram message
             return latest_release
+        '''        
     except Exception as e:
         logging.info(msg = e)
         raise Exception(e)
 
 # Testing code
-#github_scrape('EGLD')
+#xangle_token_swap_scrape()
+
+# Random Proxy
+proxy_obj = FreeProxy(rand=True)
+
+# To-do: add https proxy suppport
+proxy = {'http': proxy_obj.get()}
+print(proxy_obj)
+print(proxy)
+
+driver = os_selection(user_agent=proxy)
