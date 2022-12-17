@@ -3,20 +3,19 @@ import os
 import json
 
 def create_coins_db(coins):
-    if not(os.path.isfile('coins.db')):
-        con = sqlite3.connect('coins.db')
-        cur = con.cursor()
+    con = sqlite3.connect('coins.db')
+    cur = con.cursor()
 
-        # Create table
-        cur.execute("CREATE TABLE coins (name PRIMARY KEY, source NOT NULL, link NOT NULL, post, groups)")
-        con.commit()
+    # Create table
+    cur.execute("CREATE TABLE coins (name PRIMARY KEY, source NOT NULL, link NOT NULL, post, groups)")
+    con.commit()
 
-        # insert first values
-        query = "INSERT INTO coins VALUES (?, ?, ?, ?, ?)"
-        for coin in coins.items():
-            params = list((coin[0], coin[1]["source"], coin[1]["link"], coin[1]["post"], coin[1]["groups"]))
-            cur.execute(query, params)
-        con.commit()
+    # insert first values
+    query = "INSERT INTO coins VALUES (?, ?, ?, ?, ?)"
+    for coin in coins.items():
+        params = list((coin[0], coin[1]["source"], coin[1]["link"], coin[1]["post"], coin[1]["groups"]))
+        cur.execute(query, params)
+    con.commit()
 def create_xangle_db():
     # Should only operate if coin db is created
     if os.path.isfile('coins.db'):
@@ -44,9 +43,9 @@ def get_coin(coin):
     item = cur.execute(query, (coin,)).fetchone()
     return {
         "name": item[0],
-        "link": item[1],
-        "post": item[2],
-        "groups": item[3]}
+        "link": item[2],
+        "post": item[3],
+        "groups": item[4]}
 def update_post(post, coin):
     con = sqlite3.connect('coins.db')
     cur = con.cursor()
@@ -135,7 +134,7 @@ coins = {
     },
     "MEDI": {
     "source": "github-repo",
-    "link": "https://github.com/CortexFoundation/CortexTheseus/releases/latest",
+    "link": "https://github.com/medibloc/panacea-governance/tree/main/proposals",
     "post": "",
     "groups": ""
     },
@@ -273,10 +272,10 @@ coins = {
     }}
 
 print(len(coins.keys()))
-#create_coins_db(coins)
-create_xangle_db()
+#create_xangle_db()
 
 con = sqlite3.connect('coins.db')
 cur = con.cursor()
-#cur.execute("DROP TABLE xangle_token_swap")
+cur.execute("DROP TABLE coins")
 con.commit()
+create_coins_db(coins)

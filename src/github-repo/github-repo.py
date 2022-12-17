@@ -7,15 +7,23 @@ from bs4 import BeautifulSoup
 from fp.fp import FreeProxy
 import requests
 
+# Import file from parent directory
+from pathlib import Path
+import json
+import os
+import sys
+os.chdir(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
+sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
+
+
 from db import get_coin, update_post
 from dotenv import load_dotenv
-import json
 import logging
 
 # Environment Variables
 load_dotenv()
 
-def github_scrape(coin):
+def github_repo_scrape(coin):
     '''
     Scrapes the site change database accordingly
     
@@ -35,7 +43,7 @@ def github_scrape(coin):
         base_address = 'https://github.com'
 
         # Logging Configuration
-        logging.basicConfig(filename='./log/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
+        logging.basicConfig(filename='./logs/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
         logging.info(msg='Now monitoring {}'.format(coin_info['name']))
 
         # Configure user agent
@@ -52,39 +60,44 @@ def github_scrape(coin):
 
         # Make request to site
         s = requests.Session()
-        
+
         html = s.get(coin_info["link"], headers=headers, proxies=proxy, verify=False, timeout=50)
         soup = BeautifulSoup(html.text, 'html.parser')
     
-        # With 'latest' tag
-        latest_release = {
-            'title' : soup.find('h1', attrs={"data-view-component": "true"}).text,
-            'link': base_address + soup.select('li.breadcrumb-item a[aria-current="page"]')[0]['href']
-            #'title' : soup.find(class_ = 'Link--primary').text,
-            #'link': base_address + soup.a['href']
-        }
+        # Fetch every file from the directory
+        files = soup.select('a.js-navigation-open.Link--primary')
+        names = tuple(file.text for file in files)
+        links = tuple(base_address + file['href'] for file in files)
+
+        # Fill as a json format
+        latest_files = {}
+        for i in range(len(names)):
+            latest_files[str(i + 1)] = {
+                "title": names[i],
+                "link": links[i],
+            }
 
         # First time scraping
         if coin_info["post"] == "":
-            logging.info(msg="First time running {} monitor. Inserting a latest post...".format(coin_info["name"]))
-            update_post(latest_release, coin)
+            logging.info(msg="First time running {} monitor. Inserting file data...".format(coin_info["name"]))
+            update_post(latest_files, coin)
             s.close()
             return None
-        elif json.loads(coin_info["post"]) == latest_release:
+        elif json.loads(coin_info["post"]) == latest_files:
             logging.info(msg="{} hasn't updated yet. Moving onto next coin...".format(coin_info["name"]))
             s.close()
             return None
         else:
             logging.info(msg="{} has some updates. Now sharing via telegram...".format(coin_info["name"]))
-            update_post(latest_release, coin)
+            update_post(latest_files, coin)
             s.close()
             # Return post to send telegram message
-            latest_release['name'] = coin
-            print(latest_release)
-            return latest_release
+            latest_files['name'] = coin
+            latest_files['post'] = "See what has been committed in the link."
+            return latest_files
     except Exception as e:
         logging.info(msg = e)
         raise Exception(e)
 
 # Testing code
-github_scrape('EGLD')
+#github_repo_scrape('CTK')

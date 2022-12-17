@@ -1,12 +1,6 @@
-# Random user agents to deceive server
-from random_user_agent.user_agent import UserAgent
-from random_user_agent.params import SoftwareName, HardwareType, OperatingSystem
-
 # FreeProxy for preventing IP ban
 from fp.fp import FreeProxy
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium_config import os_selection
@@ -14,8 +8,6 @@ from selenium_config import os_selection
 #from status import get_ticker
 from dotenv import load_dotenv
 import logging
-import os
-import sys
 import sqlite3
 import time
 

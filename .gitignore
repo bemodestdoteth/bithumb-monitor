@@ -10,3 +10,4 @@ coins.db
 test.py
 status.json
 chromedriver
+__pycache__
