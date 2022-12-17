@@ -8,18 +8,31 @@ def create_coins_db(coins):
         cur = con.cursor()
 
         # Create table
-        cur.execute("CREATE TABLE coins (name PRIMARY KEY, source NOT NULL, link NOT NULL, posts)")
+        cur.execute("CREATE TABLE coins (name PRIMARY KEY, source NOT NULL, link NOT NULL, post, groups)")
         con.commit()
 
         # insert first values
-        insert_coin(coins)
+        query = "INSERT INTO coins VALUES (?, ?, ?, ?, ?)"
+        for coin in coins.items():
+            params = list((coin[0], coin[1]["source"], coin[1]["link"], coin[1]["post"], coin[1]["groups"]))
+            cur.execute(query, params)
+        con.commit()
+def create_xangle_db():
+    # Should only operate if coin db is created
+    if os.path.isfile('coins.db'):
+        con = sqlite3.connect('coins.db')
+        cur = con.cursor()
+
+        # Create table
+        cur.execute("CREATE TABLE xangle_token_swap (name NOT NULL, post NOT NULL, date NOT NULL, link NOT NULL)")
+        con.commit()
 def insert_coin(coins):
     con = sqlite3.connect('coins.db')
     cur = con.cursor()
-    query = "INSERT INTO coins VALUES (?, ?, ?, ?)"
+    query = "INSERT INTO coins VALUES (?, ?, ?, ?, ?)"
 
     for coin in coins.items():
-        params = list((coin[0], coin[1]["source"], coin[1]["link"], coin[1]["posts"]))
+        params = list((coin[0], coin[1]["source"], coin[1]["link"], coin[1]["post"], coin[1]["groups"]))
         cur.execute(query, params)
     con.commit()
 def get_coin(coin):
@@ -32,12 +45,12 @@ def get_coin(coin):
     return {
         "name": item[0],
         "link": item[1],
-        "posts": item[2],
-        "group": item[3]}
-def change_post(post, coin):
+        "post": item[2],
+        "groups": item[3]}
+def update_post(post, coin):
     con = sqlite3.connect('coins.db')
     cur = con.cursor()
-    query = "UPDATE coins SET posts = ? WHERE name = ?"
+    query = "UPDATE coins SET post = ? WHERE name = ?"
     cur.execute(query, (json.dumps(post), coin))
     con.commit()
 
@@ -87,182 +100,183 @@ coins = {
     "META": {
     "source": "brunch",
     "link": "https://brunch.co.kr/magazine/metadium-info",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },
     "EGLD": {
     "source": "github-release",
     "link": "https://github.com/ElrondNetwork/elrond-go/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },
     "THETA": {
     "source": "github-release",
     "link": "https://github.com/thetatoken/theta-protocol-ledger/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },
     "TFUEL": {
     "source": "github-release",
     "link": "https://github.com/thetatoken/theta-protocol-ledger/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },
     "TDROP": {
     "source": "github-release",
     "link": "https://github.com/thetatoken/theta-protocol-ledger/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },
     "CTXC": {
     "source": "github-release",
     "link": "https://github.com/CortexFoundation/CortexTheseus/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },
     "MEDI": {
     "source": "github-repo",
     "link": "https://github.com/CortexFoundation/CortexTheseus/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },
     "XYM": {
     "source": "github-release",
     "link": "https://github.com/symbol/symbol/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },
     "ATOLO": {
     "source": "mintscan",
     "link": "https://www.mintscan.io/rizon/proposals",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"HIVE": {
     "source": "github-release",
     "link": "https://github.com/openhive-network/hive/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"QKC": {
     "source": "github-repo",
     "link": "https://github.com/QuarkChain/QCEPs/tree/master/QCEP",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"ZIL": {
     "source": "github-release",
     "link": "https://github.com/Zilliqa/Zilliqa/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"XTZ": {
     "source": "xtz-agora",
     "link": "https://www.tezosagora.org/period/86",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"ICX": {
     "source": "icx-forum",
     "link": "https://forum.icon.community/search?expanded=true&q=hard%20fork",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"VET": {
     "source": "github-release",
     "link": "https://github.com/vechain/thor/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"XEC": {
     "source": "xec-release",
     "link": "https://www.bitcoinabc.org/releases/latest/",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"SNX": {
     "source": "snx-blog",
     "link": "https://blog.synthetix.io/author/synthetix/",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"ALGO": {
     "source": "github-release",
     "link": "https://github.com/algorand/go-algorand/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"ONT": {
     "source": "github-release",
     "link": "https://github.com/ontio/ontology/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"ONG": {
     "source": "github-release",
     "link": "https://github.com/ontio/ontology/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"IOST": {
     "source": "github-release",
     "link": "https://github.com/iost-official/go-iost/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"QTUM": {
     "source": "github-release",
     "link": "https://github.com/qtumproject/qtum/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"CTK": {
     "source": "github-repo",
     "link": "https://github.com/ShentuChain/mainnet",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"VELO": {
     "source": "github-release",
     "link": "https://github.com/stellar/stellar-core/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"CENNZ": {
     "source": "github-release",
     "link": "https://github.com/cennznet/cennznet/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"ETC": {
     "source": "xangle",
     "link": "https://xangle.io/insight/disclosure?search=etc&category=network_fork",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"CSPR": {
     "source": "detect-page-change",
     "link": "https://github.com/casper-network/casper-node/wiki/Upgrade-to-Casper-node-v1.4.9",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"REI": {
     "source": "github-release",
     "link": "https://github.com/REI-Network/rei/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"CKB": {
     "source": "github-release",
     "link": "https://github.com/nervosnetwork/ckb/releases/latest",
-    "posts": "",
-    "group": ""
+    "post": "",
+    "groups": ""
     },"KCT-7": {
     "source": "github-release",
     "link": "https://github.com/klaytn/klaytn/releases/latest",
-    "posts": "",
-    "group": "HIPS, SSX, TEMCO, WIKEN, OBSR, BORA, NPT, SIX, MBX"
+    "post": "",
+    "groups": "HIPS, SSX, TEMCO, WIKEN, OBSR, BORA, NPT, SIX, MBX"
     },"TRC-20": {
     "source": "github-release",
     "link": "https://github.com/tronprotocol/java-tron/releases/latest",
-    "posts": "",
-    "group": "BTT, JST, SUN"
+    "post": "",
+    "groups": "BTT, JST, SUN"
     },"BEP-20": {
     "source": "github-release",
     "link": "https://github.com/bnb-chain/node/releases/latest",
-    "posts": "",
-    "group": "CAKE, XVS, ALT, GMT, C98, SPRT"
+    "post": "",
+    "groups": "CAKE, XVS, ALT, GMT, C98, SPRT"
     },"ERC-20": {
     "source": "github-release",
     "link": "https://github.com/ethereum/go-ethereum/releases/latest",
-    "posts": "",
-    "group": "OGN, GLM, WOZX, TRV, OCEAN, BOBA"
+    "post": "",
+    "groups": "OGN, GLM, WOZX, TRV, OCEAN, BOBA"
     }}
 
 print(len(coins.keys()))
 #create_coins_db(coins)
+create_xangle_db()
 
 con = sqlite3.connect('coins.db')
 cur = con.cursor()
-cur.execute("UPDATE coins SET link = ? WHERE name = ?", (coins["EGLD"]["link"], "EGLD"))
+#cur.execute("DROP TABLE xangle_token_swap")
 con.commit()

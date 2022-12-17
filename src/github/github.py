@@ -81,10 +81,12 @@ def github_scrape(coin):
             change_post(latest_release, coin)
             s.close()
             # Return post to send telegram message
+            latest_release['name'] = coin
+            print(latest_release)
             return latest_release
     except Exception as e:
         logging.info(msg = e)
         raise Exception(e)
 
 # Testing code
-#github_scrape('EGLD')
+github_scrape('EGLD')
