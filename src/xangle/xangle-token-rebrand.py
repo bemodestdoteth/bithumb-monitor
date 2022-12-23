@@ -1,5 +1,3 @@
-# FreeProxy for preventing IP ban
-from fp.fp import FreeProxy
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,17 +10,14 @@ os.chdir(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 
 from status import get_ticker
-from selenium_config import os_selection
+from config import prior_setup_selenium
 from dotenv import load_dotenv
 import logging
 import sqlite3
 import time
 
-# Adding system path for import
-
 # Environment Variables
 load_dotenv()
-url = "https://xangle.io/insight/disclosure?category=token_rebranding"
 
 def empty_database():
     con = sqlite3.connect('coins.db')
@@ -34,28 +29,17 @@ def empty_database():
     else:
         con.close()
         return False
-def xangle_token_rebrand_scrape():
+@prior_setup_selenium
+def xangle_token_rebrand_scrape(coin, driver, delay = 5):
     '''
     Scrapes the site and changes database accordingly
     '''
-    try:
-        print('''
-        \n-----------------------------------------
-        NOW WATCHING XANGLE TOKEN REBRAND DISCLOSURE\n-----------------------------------------\n
-        ''')
-        
+    try:        
         # Logging Configuration
         logging.basicConfig(filename='./logs/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
         logging.info(msg='Now monitoring xangle token rebrand disclosure...')
 
-        # Selenium Webdriverwait delay
-        delay = 5
-
-        # To-do: add https proxy suppport
-        proxy = {'http': FreeProxy().get()}
-
-        # Open website
-        driver = os_selection(user_agent=proxy)
+        url = "https://xangle.io/insight/disclosure?category=token_rebranding"
         driver.get(url)
         WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, '.bc-insight-list-item-wrapper')))
 
@@ -110,4 +94,4 @@ def xangle_token_rebrand_scrape():
         raise Exception(e)
 
 # Testing code
-xangle_token_rebrand_scrape()
+xangle_token_rebrand_scrape({"name": "TOKEN REBRAND DISCLOSURE"})

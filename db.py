@@ -52,6 +52,7 @@ def get_coin(coin):
     item = cur.execute(query, (coin,)).fetchone()
     return {
         "name": item[0],
+        "source": item[1],
         "link": item[2],
         "post": item[3],
         "groups": item[4]}
@@ -64,6 +65,7 @@ def get_all_coins():
         for i in item:
             res.append({
             "name": i[0],
+            "source": i[1],
             "link": i[2],
             "post": i[3],
             "groups": i[4]})
@@ -284,11 +286,10 @@ coins = {
     "groups": "OGN, GLM, WOZX, TRV, OCEAN, BOBA"
     }}
 
-
+'''
 print(len(coins.keys()))
 create_xangle_rebrand_db()
 
-'''
 con = sqlite3.connect('coins.db')
 cur = con.cursor()
 cur.execute("DROP TABLE coins")

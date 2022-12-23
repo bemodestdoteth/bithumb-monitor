@@ -73,7 +73,7 @@ def github_repo_scrape(coin):
         # First time scraping
         if coin["post"] == "":
             logging.info(msg="First time running {} monitor. Inserting file data...".format(coin["name"]))
-            update_post(latest_files, coin)
+            update_post(latest_files, coin['name'])
             s.close()
             return None
         elif json.loads(coin["post"]) == latest_files:
@@ -82,15 +82,10 @@ def github_repo_scrape(coin):
             return None
         else:
             logging.info(msg="{} has some updates. Now sharing via telegram...".format(coin["name"]))
-            update_post(latest_files, coin)
+            update_post(latest_files, coin['name'])
             s.close()
             # Return post to send telegram message
-            latest_files['name'] = coin
-            latest_files['post'] = "See what has been committed in the link."
-            return latest_files
+            return {'name': coin['name'], 'title': "See what has been committed in the link.", 'link': coin['link']}
     except Exception as e:
         logging.info(msg = e)
         raise Exception(e)
-
-# Testing code
-github_repo_scrape('CTK')

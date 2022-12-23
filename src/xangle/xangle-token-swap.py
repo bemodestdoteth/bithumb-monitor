@@ -12,17 +12,13 @@ os.chdir(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 
 from status import get_ticker
-from selenium_config import os_selection
+from config import prior_setup_selenium
 from dotenv import load_dotenv
 import logging
 import sqlite3
-import time
-
-# Adding system path for import
 
 # Environment Variables
 load_dotenv()
-url = "https://xangle.io/insight/disclosure?category=token_swap"
 
 def empty_database():
     con = sqlite3.connect('coins.db')
@@ -34,28 +30,17 @@ def empty_database():
     else:
         con.close()
         return False
-def xangle_token_swap_scrape():
+@prior_setup_selenium
+def xangle_token_swap_scrape(coin, driver, delay = 5):
     '''
     Scrapes the site and changes database accordingly
     '''
     try:
-        print('''
-        \n-----------------------------------------
-        NOW WATCHING XANGLE TOKEN SWAP DISCLOSURE\n-----------------------------------------\n
-        ''')
-        
         # Logging Configuration
         logging.basicConfig(filename='./logs/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
         logging.info(msg='Now monitoring xangle token swap disclosure...')
 
-        # Selenium Webdriverwait delay
-        delay = 5
-
-        # To-do: add https proxy suppport
-        proxy = {'http': FreeProxy().get()}
-
-        # Open website
-        driver = os_selection(user_agent=proxy)
+        url = "https://xangle.io/insight/disclosure?category=token_swap"
         driver.get(url)
         WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, '.bc-insight-list-item-wrapper')))
 
@@ -100,14 +85,10 @@ def xangle_token_swap_scrape():
                 return {"name": item_site_comp[0], "title":item_site_comp[1], "link": item_site_comp[3] }
             else:
                 logging.info(msg="A new coin swap disclosure has been discovered, buy it hasn't been listed on Bithumb.")
-                return None                
-        
-        while True:
-            print("Working")
-            time.sleep(1)
+                return None
     except Exception as e:
         logging.info(msg = e)
         raise Exception(e)
 
 # Testing code
-xangle_token_swap_scrape()
+xangle_token_swap_scrape({"name": "TOKEN SWAP DISCLOSURE"})
