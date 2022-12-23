@@ -2,18 +2,34 @@
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import SoftwareName, HardwareType, OperatingSystem
 
-# FreeProxy for preventing IP ban
+# VPN for roataing IP Address
 from bs4 import BeautifulSoup
-from fp.fp import FreeProxy
+from nordvpn_switcher import initialize_VPN, rotate_VPN, terminate_VPN
 import requests
+
+# FreeProxy for preventing IP ban
+from fp.fp import FreeProxy
+
+# Import file from parent directory
+from pathlib import Path
+import json
+import os
+import time
+import sys
+os.chdir(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
+sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 
 from db import get_coin, update_post
 from dotenv import load_dotenv
-import json
 import logging
 
 # Environment Variables
 load_dotenv()
+
+def prior_setup_bs4(func):
+    def inner(*args, **kwargs):
+        return func(*args, **kwargs)
+    return inner
 
 def github_scrape(coin):
     '''
@@ -35,7 +51,7 @@ def github_scrape(coin):
         base_address = 'https://github.com'
 
         # Logging Configuration
-        logging.basicConfig(filename='./log/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
+        logging.basicConfig(filename='./logs/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
         logging.info(msg='Now monitoring {}'.format(coin_info['name']))
 
         # Configure user agent
@@ -78,6 +94,7 @@ def github_scrape(coin):
             logging.info(msg="{} has some updates. Now sharing via telegram...".format(coin_info["name"]))
             update_post(latest_release, coin)
             s.close()
+
             # Return post to send telegram message
             latest_release['name'] = coin
             print(latest_release)
@@ -87,4 +104,14 @@ def github_scrape(coin):
         raise Exception(e)
 
 # Testing code
-github_scrape('EGLD')
+for item in ['TFUEL']:
+    github_scrape(item)
+
+'''
+settings = initialize_VPN(area_input=['South Korea, Japan, Taiwan, Hong Kong'])
+while True:
+    print('Working...')
+    rotate_VPN(settings)
+    time.sleep(10)
+terminate_VPN(settings)
+'''

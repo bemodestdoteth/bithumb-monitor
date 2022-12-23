@@ -15,7 +15,6 @@ import sys
 os.chdir(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 
-
 from db import get_coin, update_post
 from dotenv import load_dotenv
 import logging
@@ -100,4 +99,4 @@ def github_repo_scrape(coin):
         raise Exception(e)
 
 # Testing code
-#github_repo_scrape('CTK')
+github_repo_scrape('CTK')

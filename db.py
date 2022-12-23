@@ -271,11 +271,13 @@ coins = {
     "groups": "OGN, GLM, WOZX, TRV, OCEAN, BOBA"
     }}
 
+'''
 print(len(coins.keys()))
-#create_xangle_db()
+create_xangle_db()
 
 con = sqlite3.connect('coins.db')
 cur = con.cursor()
 cur.execute("DROP TABLE coins")
 con.commit()
 create_coins_db(coins)
+'''

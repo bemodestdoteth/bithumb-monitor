@@ -3,9 +3,16 @@ from fp.fp import FreeProxy
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium_config import os_selection
 
-#from status import get_ticker
+# Import file from parent directory
+from pathlib import Path
+import os
+import sys
+os.chdir(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
+sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
+
+from status import get_ticker
+from selenium_config import os_selection
 from dotenv import load_dotenv
 import logging
 import sqlite3
@@ -38,8 +45,8 @@ def xangle_token_swap_scrape():
         ''')
         
         # Logging Configuration
-        #logging.basicConfig(filename='./log/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
-        #logging.info(msg='Now monitoring xangle token swap disclosure...')
+        logging.basicConfig(filename='./logs/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
+        logging.info(msg='Now monitoring xangle token swap disclosure...')
 
         # Random Proxy
         proxy_obj = FreeProxy(rand=True)
@@ -88,10 +95,15 @@ def xangle_token_swap_scrape():
             if item_db == item_site_comp:
                 logging.info(msg="No new coin swap disclosure on xangle.")
                 return None
-            else:
+            # Should only pass coins listed on Bithumb
+            elif item_db[0] in (item for sublist in get_ticker().values() for item in sublist):
                 logging.info(msg="New coin swap disclosure detected on xangle.")
+
                 # Return post to send telegram message
                 return {"name": item_site_comp[0], "title":item_site_comp[1], "link": item_site_comp[3] }
+            else:
+                logging.info(msg="A new coin swap disclosure has been discovered, buy it hasn't been listed on Bithumb.")
+                return None                
         
         while True:
             print("Working")
@@ -101,4 +113,4 @@ def xangle_token_swap_scrape():
         raise Exception(e)
 
 # Testing code
-#xangle_token_swap_scrape()
+xangle_token_swap_scrape()
