@@ -16,7 +16,7 @@ def create_coins_db(coins):
         params = list((coin[0], coin[1]["source"], coin[1]["link"], coin[1]["post"], coin[1]["groups"]))
         cur.execute(query, params)
     con.commit()
-def create_xangle_db():
+def create_xangle_swap_db():
     # Should only operate if coin db is created
     if os.path.isfile('coins.db'):
         con = sqlite3.connect('coins.db')
@@ -24,6 +24,15 @@ def create_xangle_db():
 
         # Create table
         cur.execute("CREATE TABLE xangle_token_swap (name NOT NULL, post NOT NULL, date NOT NULL, link NOT NULL)")
+        con.commit()
+def create_xangle_rebrand_db():
+    # Should only operate if coin db is created
+    if os.path.isfile('coins.db'):
+        con = sqlite3.connect('coins.db')
+        cur = con.cursor()
+
+        # Create table
+        cur.execute("CREATE TABLE xangle_token_rebrand (name NOT NULL, post NOT NULL, date NOT NULL, link NOT NULL)")
         con.commit()
 def insert_coin(coins):
     con = sqlite3.connect('coins.db')
@@ -46,6 +55,21 @@ def get_coin(coin):
         "link": item[2],
         "post": item[3],
         "groups": item[4]}
+def get_all_coins():
+    con = sqlite3.connect('coins.db')
+    cur = con.cursor()
+    item = cur.execute("SELECT * FROM coins;")
+    try:
+        res = []
+        for i in item:
+            res.append({
+            "name": i[0],
+            "link": i[2],
+            "post": i[3],
+            "groups": i[4]})
+        return res
+    except:
+        return None
 def update_post(post, coin):
     con = sqlite3.connect('coins.db')
     cur = con.cursor()
@@ -83,17 +107,6 @@ def update_config(coin, name=None, link=None, delay=None, details=None):
     if empty is False:
         cur.execute(query)
         con.commit()
-def get_all_coins():
-    con = sqlite3.connect('coins.db')
-    cur = con.cursor()
-    item = cur.execute("SELECT * FROM coins;")
-    try:
-        items = []
-        for i in item:
-            items.append(i)
-        return items
-    except:
-        return None
 
 coins = {
     "META": {
@@ -271,10 +284,11 @@ coins = {
     "groups": "OGN, GLM, WOZX, TRV, OCEAN, BOBA"
     }}
 
-'''
-print(len(coins.keys()))
-create_xangle_db()
 
+print(len(coins.keys()))
+create_xangle_rebrand_db()
+
+'''
 con = sqlite3.connect('coins.db')
 cur = con.cursor()
 cur.execute("DROP TABLE coins")

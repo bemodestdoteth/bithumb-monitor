@@ -22,40 +22,37 @@ import time
 
 # Environment Variables
 load_dotenv()
-url = "https://xangle.io/insight/disclosure?category=token_swap"
+url = "https://xangle.io/insight/disclosure?category=token_rebranding"
 
 def empty_database():
     con = sqlite3.connect('coins.db')
     cur = con.cursor()
-    db_records = cur.execute("SELECT name FROM xangle_token_swap").fetchall()
+    db_records = cur.execute("SELECT name FROM xangle_token_rebrand").fetchall()
     if len(db_records) == 0:
         con.close()
         return True
     else:
         con.close()
         return False
-def xangle_token_swap_scrape():
+def xangle_token_rebrand_scrape():
     '''
     Scrapes the site and changes database accordingly
     '''
     try:
         print('''
         \n-----------------------------------------
-        NOW WATCHING XANGLE TOKEN SWAP DISCLOSURE\n-----------------------------------------\n
+        NOW WATCHING XANGLE TOKEN REBRAND DISCLOSURE\n-----------------------------------------\n
         ''')
         
         # Logging Configuration
         logging.basicConfig(filename='./logs/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
-        logging.info(msg='Now monitoring xangle token swap disclosure...')
-
-        # Random Proxy
-        proxy_obj = FreeProxy(rand=True)
+        logging.info(msg='Now monitoring xangle token rebrand disclosure...')
 
         # Selenium Webdriverwait delay
         delay = 5
 
         # To-do: add https proxy suppport
-        proxy = {'http': proxy_obj.get()}
+        proxy = {'http': FreeProxy().get()}
 
         # Open website
         driver = os_selection(user_agent=proxy)
@@ -75,7 +72,7 @@ def xangle_token_swap_scrape():
             # Connect database and add records
             con = sqlite3.connect('coins.db')
             cur = con.cursor()
-            query = "INSERT INTO xangle_token_swap VALUES (?, ?, ?, ?)"
+            query = "INSERT INTO xangle_token_rebrand VALUES (?, ?, ?, ?)"
             for i in range(len(names)):
                 params = (names[i], posts[i], dates[i], links[i])
                 cur.execute(query, params)
@@ -84,7 +81,7 @@ def xangle_token_swap_scrape():
             # Get records from the database
             con = sqlite3.connect('coins.db')
             cur = con.cursor()
-            item_db = cur.execute("SELECT * FROM xangle_token_swap").fetchone()
+            item_db = cur.execute("SELECT * FROM xangle_token_rebrand").fetchone()
 
             # Get records from the site
             item = driver.find_element(by=By.CSS_SELECTOR, value='.bc-insight-list-item-wrapper')
@@ -93,16 +90,16 @@ def xangle_token_swap_scrape():
             item_site_comp = (item_rec[1], item_rec[5], item_rec[4], item_link)
 
             if item_db == item_site_comp:
-                logging.info(msg="No new coin swap disclosure on xangle.")
+                logging.info(msg="No new coin rebrand disclosure on xangle.")
                 return None
             # Should only pass coins listed on Bithumb
             elif item_db[0] in (item for sublist in get_ticker().values() for item in sublist):
-                logging.info(msg="New coin swap disclosure detected on xangle.")
+                logging.info(msg="New coin rebrand disclosure detected on xangle.")
 
                 # Return post to send telegram message
                 return {"name": item_site_comp[0], "title":item_site_comp[1], "link": item_site_comp[3] }
             else:
-                logging.info(msg="A new coin swap disclosure has been discovered, buy it hasn't been listed on Bithumb.")
+                logging.info(msg="A new coin rebrand disclosure has been discovered, buy it hasn't been listed on Bithumb.")
                 return None                
         
         while True:
@@ -113,4 +110,4 @@ def xangle_token_swap_scrape():
         raise Exception(e)
 
 # Testing code
-xangle_token_swap_scrape()
+xangle_token_rebrand_scrape()

@@ -39,37 +39,31 @@ def github_scrape(coin):
         coin (str) -- Name of the coin
     '''
     try:
-        # Get coin infor from database
-        coin_info = get_coin(coin)
-
         print('''
         \n-----------------------------------------
         NOW WATCHING {}\n-----------------------------------------\n
-        '''.format(coin_info['name']))
+        '''.format(coin['name']))
         
         # Storing post
         base_address = 'https://github.com'
 
         # Logging Configuration
         logging.basicConfig(filename='./logs/scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
-        logging.info(msg='Now monitoring {}'.format(coin_info['name']))
+        logging.info(msg='Now monitoring {}'.format(coin['name']))
 
         # Configure user agent
         software_names = [SoftwareName.CHROME.value]
         hardware_type = [HardwareType.COMPUTER]
         user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hardware_type)
 
-        # Random Proxy
-        proxy_obj = FreeProxy(rand=True)
-
         # To-do: add https proxy suppport
-        proxy = {'http': proxy_obj.get()}
+        proxy = {'http': FreeProxy().get()}
         headers = {'User-Agent': user_agent_rotator.get_random_user_agent()}
 
         # Make request to site
         s = requests.Session()
         
-        html = s.get(coin_info["link"], headers=headers, proxies=proxy, verify=False, timeout=50)
+        html = s.get(coin["link"], headers=headers, proxies=proxy, verify=False, timeout=50)
         soup = BeautifulSoup(html.text, 'html.parser')
     
         # With 'latest' tag
@@ -81,17 +75,17 @@ def github_scrape(coin):
         }
 
         # First time scraping
-        if coin_info["post"] == "":
-            logging.info(msg="First time running {} monitor. Inserting a latest post...".format(coin_info["name"]))
+        if coin["post"] == "":
+            logging.info(msg="First time running {} monitor. Inserting a latest post...".format(coin["name"]))
             update_post(latest_release, coin)
             s.close()
             return None
-        elif json.loads(coin_info["post"]) == latest_release:
-            logging.info(msg="{} hasn't updated yet. Moving onto next coin...".format(coin_info["name"]))
+        elif json.loads(coin["post"]) == latest_release:
+            logging.info(msg="{} hasn't updated yet. Moving onto next coin...".format(coin["name"]))
             s.close()
             return None
         else:
-            logging.info(msg="{} has some updates. Now sharing via telegram...".format(coin_info["name"]))
+            logging.info(msg="{} has some updates. Now sharing via telegram...".format(coin["name"]))
             update_post(latest_release, coin)
             s.close()
 
@@ -106,12 +100,3 @@ def github_scrape(coin):
 # Testing code
 for item in ['TFUEL']:
     github_scrape(item)
-
-'''
-settings = initialize_VPN(area_input=['South Korea, Japan, Taiwan, Hong Kong'])
-while True:
-    print('Working...')
-    rotate_VPN(settings)
-    time.sleep(10)
-terminate_VPN(settings)
-'''
