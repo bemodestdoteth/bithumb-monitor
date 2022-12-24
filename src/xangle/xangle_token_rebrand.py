@@ -94,4 +94,4 @@ def xangle_token_rebrand_scrape(coin, driver, delay = 5):
         raise Exception(e)
 
 # Testing code
-xangle_token_rebrand_scrape({"name": "TOKEN REBRAND DISCLOSURE"})
+#xangle_token_rebrand_scrape({"name": "TOKEN REBRAND DISCLOSURE"})

@@ -39,7 +39,6 @@ def prior_setup_selenium(func):
         driver = os_selection(user_agent=proxy)
         return func(coin, driver, delay = 5)
     return inner
-
 def os_selection(user_agent):
     chrome_options = webdriver.ChromeOptions()
     # Selenium on Linux
@@ -68,8 +67,6 @@ def os_selection(user_agent):
         '''
     driver = webdriver.Chrome(options=chrome_options)
     return driver
-# Change to a synchronous activity
 def update_chromedriver():
     if os.name == 'posix': # Only on linux
-        os.system('version=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE") & wget -qP /tmp/ "https://chromedriver.storage.googleapis.com/${version}/chromedriver_linux64.zip" & sudo unzip -o /tmp/chromedriver_linux64.zip -d ~/works/python-bithumb-monitor')
-        
+        os.system('version=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE");wget -qP /tmp/ "https://chromedriver.storage.googleapis.com/${version}/chromedriver_linux64.zip";sudo unzip -o /tmp/chromedriver_linux64.zip -d ~/usr/bin;rm /tmp/chromedriver_linux64.zip')

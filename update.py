@@ -40,20 +40,25 @@ async def send_message(update_info):
     await bot.sendMessage(chat_id=chat_id, text=msg, parse_mode='markdownv2')
 def get_update():
     while True:
-        coins = get_all_coins()
-        for coin in coins:
-            result = scrape_func_selector(coin)
-            if result is None:
-                print("{} has no further updates".format(coin['name']))
-            elif result == "New":
-                print("A new data has been inserted into {}".format(coin['name']))                
-            else:
-                print("{} has some update. Sending via telegram message...".format(result['name']))
-                asyncio.run(send_message(result))
+        try:
+            coins = get_all_coins()
+            for coin in coins:
+                result = scrape_func_selector(coin)
+                if result is None:
+                    print("{} has no further updates".format(coin['name']))
+                elif result == "New":
+                    print("A new data has been inserted into {}".format(coin['name']))                
+                else:
+                    print("{} has some update. Sending via telegram message...".format(result['name']))
+                    asyncio.run(send_message(result))
 
-        # Look for xangle updates after looking through each token
-        xangle_token_swap_scrape()
-        xangle_token_rebrand_scrape()
+            # Look for xangle updates after looking through each token
+            xangle_token_swap_scrape()
+            xangle_token_rebrand_scrape()
 
-        # 30 min cooldown after a successful scraping.
-        time.sleep(1800)
+            # 30 min cooldown after a successful scraping.
+            time.sleep(1800)
+        except Exception as e:
+            #logging.info(e)
+            print(e)
+            break

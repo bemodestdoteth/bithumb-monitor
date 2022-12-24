@@ -24,8 +24,6 @@ def get_proxy():
     # To-do: add https proxy suppport
     proxy = {'http': proxy_obj.get()}
     return proxy
-
-# Currently not using maesoo
 def maesoo(coin):
     bithumb = Bithumb(os.environ['CONNECT_KEY'], os.environ['SECRET_KEY'])
 
@@ -92,30 +90,32 @@ def get_status():
             response = requests.get(url,proxies=proxy, headers=headers)
             api_n = json.loads(response.text)['data']
 
-            with open('./status.json','r') as f:
-                api_o = json.loads(f.readline())
+            # If there's no status.json, skip the whole process and save the first result as status.json
+            if os.path.isfile('./status.json'):
+                with open('./status.json','r') as f:
+                    api_o = json.loads(f.readline())
 
-            for coin in api_n.keys():
-                if coin not in tuple(api_o.keys()):
-                    print('New coin: {}'.format(coin))
+                for coin in api_n.keys():
+                    if coin not in tuple(api_o.keys()):
+                        print('New coin: {}'.format(coin))
 
-                elif api_n[coin] != api_o[coin]:
-                    #if api_n[coin]['withdrawal_status'] == 0:
-                    if api_n[coin]['withdrawal_status'] == 1:
-                        if coin in tickers:
-                            print('{} withdrawal closed. Selling {}...'.format(coin, coin))
-                            maedo(coin)
-                    elif api_n[coin]['withdrawal_status'] == 0:
-                        if coin in tickers:
-                            print('{} withdrawal opened'.format(coin))
-                            #print('Selling {}...'.format(coin))
-                            #maesoo(coin)
+                    elif api_n[coin] != api_o[coin]:
+                        if api_n[coin]['withdrawal_status'] == 0:
+                        #if api_n[coin]['withdrawal_status'] == 1:
+                            if coin in tickers:
+                                print('{} withdrawal closed. Selling {}...'.format(coin, coin))
+                                maedo(coin)
+                        elif api_n[coin]['withdrawal_status'] == 0:
+                            if coin in tickers:
+                                print('{} withdrawal opened'.format(coin))
+                                #print('Selling {}...'.format(coin))
+                                #maesoo(coin)
 
             with open('./status.json','w') as f:
                 f.write(json.dumps(api_n))
                 logging.info(msg='Suucessfully fetched deposit and withdraw status.')
                 print('Sucessfully fetched deposit and withdraw status.')
-            
+                        
             ticker_timer = ticker_timer + 1
             proxy_timer = proxy_timer + 1
 
@@ -135,9 +135,3 @@ def get_status():
         except Exception as e:
             logging.info(e)
             break
-
-try:
-    #print(get_ticker())
-    get_status()
-except Exception as e:
-    print(e)
