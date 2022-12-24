@@ -1,0 +1,10 @@
+beautifulsoup4==4.11.1
+fp==0.2
+free_proxy==1.1.0
+pybithumb==1.0.21
+python-dotenv==0.21.0
+python_telegram_bot==20.0a6
+random_user_agent==1.0.1
+requests==2.25.1
+selenium==4.7.2
+telegram==0.0.1
