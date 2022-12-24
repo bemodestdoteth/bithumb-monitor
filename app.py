@@ -1,9 +1,7 @@
-from dotenv import load_dotenv
 from status import get_status
 from update import get_update
+from config import print_n_log
 from concurrent.futures import ThreadPoolExecutor
-
-load_dotenv()
 
 def main():
     with ThreadPoolExecutor() as executor:
@@ -14,4 +12,6 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("Exiting program")
+        print_n_log("Exiting program")
+    except Exception as e:
+        print_n_log(e, True)

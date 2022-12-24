@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta
 from db import coins, get_coin, get_all_coins, create_coins_db, create_xangle_rebrand_db, create_xangle_swap_db
 from dotenv import load_dotenv
-from status import get_status
+from config import print_n_log
 import asyncio
 import telegram
 import time
@@ -23,7 +24,7 @@ def scrape_func_selector(coin):
         elif coin['source'] == "mintscan":
             return mintscan_scrape(coin)
         else:
-            print("{}: Not updated yet.".format(coin['name']))
+            print_n_log("Scraping {}: Not updated yet.".format(coin['name']))
     except Exception as e:
         raise Exception(e)
 async def send_message(update_info):
@@ -41,30 +42,26 @@ async def send_message(update_info):
 def get_update():
     # Check db existence before beginning
     if not(os.path.isdir("coins.db")):
-        print("No database detected. Creating new before moving on.")
+        print_n_log("No database detected. Creating new before moving on.")
         create_coins_db()
         create_xangle_swap_db()
         create_xangle_rebrand_db()
     while True:
-        try:
-            coins = get_all_coins()
-            for coin in coins:
-                result = scrape_func_selector(coin)
-                if result is None:
-                    print("{} has no further updates".format(coin['name']))
-                elif result == "New":
-                    print("A new data has been inserted into {}".format(coin['name']))                
-                else:
-                    print("{} has some update. Sending via telegram message...".format(result['name']))
-                    asyncio.run(send_message(result))
+        coins = get_all_coins()
+        for coin in coins:
+            result = scrape_func_selector(coin)
+            if result is None:
+                print_n_log("{} has no further updates".format(coin['name']))
+            elif result == "New":
+                print_n_log("A new data has been inserted into {}".format(coin['name']))                
+            else:
+                print_n_log("{} has some update. Sending via telegram message...".format(result['name']))
+                asyncio.run(send_message(result))
 
-            # Look for xangle updates after looking through each token
-            xangle_token_swap_scrape()
-            xangle_token_rebrand_scrape()
+        # Look for xangle updates after looking through each token
+        xangle_token_swap_scrape("TOKEN SWAP DISCLOSURE")
+        xangle_token_rebrand_scrape("TOKEN REBRAND DISCLOSURE")
 
-            # 30 min cooldown after a successful scraping.
-            time.sleep(1800)
-        except Exception as e:
-            #logging.info(e)
-            print(e)
-            break
+        # 30 min cooldown after a successful scraping.
+        print_n_log("Website updating job finished. Next job is projected at {}".format(datetime.strftime(datetime.now() + timedelta(minutes=30), format="%Y/%m/%d %H:%M:%S")))
+        time.sleep(1800)

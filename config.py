@@ -6,14 +6,15 @@ from random_user_agent.params import SoftwareName, HardwareType, OperatingSystem
 from fp.fp import FreeProxy
 
 from selenium import webdriver
+from datetime import datetime
+import logging
 import os
 
 def prior_setup_bs4(func):
     def inner(coin):
-        print('''
-        \n-----------------------------------------
-        NOW WATCHING {}\n-----------------------------------------\n
-        '''.format(coin['name']))
+        print("-----------------------------------------")
+        print_n_log("NOW WATCHING {}".format(coin['name']))
+        print("-----------------------------------------")
 
         # Configure user agent
         software_names = [SoftwareName.CHROME.value]
@@ -27,10 +28,9 @@ def prior_setup_bs4(func):
     return inner
 def prior_setup_selenium(func):
     def inner(coin):
-        print('''
-        \n-----------------------------------------
-        NOW WATCHING {}\n-----------------------------------------\n
-        '''.format(coin['name'])) 
+        print("-----------------------------------------")
+        print_n_log("NOW WATCHING {}".format(coin['name']))
+        print("-----------------------------------------")
 
         # To-do: add https proxy suppport
         proxy = {'http': FreeProxy().get()}
@@ -69,4 +69,13 @@ def os_selection(user_agent):
     return driver
 def update_chromedriver():
     if os.name == 'posix': # Only on linux
-        os.system('version=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE");wget -qP /tmp/ "https://chromedriver.storage.googleapis.com/${version}/chromedriver_linux64.zip";sudo unzip -o /tmp/chromedriver_linux64.zip -d ~/usr/bin;rm /tmp/chromedriver_linux64.zip')
+        os.system('version=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE");wget -qP /tmp/ "https://chromedriver.storage.googleapis.com/${version}/chromedriver_linux64.zip";sudo unzip -o /tmp/chromedriver_linux64.zip -d /usr/bin;rm /tmp/chromedriver_linux64.zip')
+def print_n_log(msg, is_error = False):
+    if not(is_error):
+        print("{}  {}".format(datetime.strftime(datetime.now(), format="%Y/%m/%d %H:%M:%S"), msg))
+        logging.basicConfig(filename='./scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
+        logging.info(msg)
+    else:
+        print("{}  Error: {}".format(datetime.strftime(datetime.now(), format="%Y/%m/%d %H:%M:%S"), msg))
+        logging.basicConfig(filename='./scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
+        logging.error(msg)
