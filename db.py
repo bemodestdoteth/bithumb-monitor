@@ -2,7 +2,7 @@ import sqlite3
 import os
 import json
 
-def create_coins_db(coins):
+def create_coins_db():
     con = sqlite3.connect('coins.db')
     cur = con.cursor()
 
@@ -285,14 +285,3 @@ coins = {
     "post": "",
     "groups": "OGN, GLM, WOZX, TRV, OCEAN, BOBA"
     }}
-
-'''
-print(len(coins.keys()))
-create_xangle_rebrand_db()
-
-con = sqlite3.connect('coins.db')
-cur = con.cursor()
-cur.execute("DROP TABLE coins")
-con.commit()
-create_coins_db(coins)
-'''

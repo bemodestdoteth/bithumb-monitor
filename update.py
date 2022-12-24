@@ -1,4 +1,4 @@
-from db import get_coin, get_all_coins
+from db import coins, get_coin, get_all_coins, create_coins_db, create_xangle_rebrand_db, create_xangle_swap_db
 from dotenv import load_dotenv
 from status import get_status
 import asyncio
@@ -39,6 +39,12 @@ async def send_message(update_info):
     msg = '🔔**{} has a new update\!**🔔\n**{}**\n**{}**\n'.format(update_name, update_title, update_link)
     await bot.sendMessage(chat_id=chat_id, text=msg, parse_mode='markdownv2')
 def get_update():
+    # Check db existence before beginning
+    if not(os.path.isdir("coins.db")):
+        print("No database detected. Creating new before moving on.")
+        create_coins_db()
+        create_xangle_swap_db()
+        create_xangle_rebrand_db()
     while True:
         try:
             coins = get_all_coins()

@@ -2,9 +2,6 @@ from dotenv import load_dotenv
 from status import get_status
 from update import get_update
 from concurrent.futures import ThreadPoolExecutor
-import logging
-import os
-import time
 
 load_dotenv()
 
