@@ -2,13 +2,18 @@ from dotenv import load_dotenv
 from status import get_status
 from update import get_update
 from concurrent.futures import ThreadPoolExecutor
-import time
 import logging
 import os
 
 load_dotenv()
 
+def main():
+    with ThreadPoolExecutor() as executor:
+        executor.submit(get_status())
+        executor.submit(get_update())
+
 if __name__ == "__main__":
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        #status_thread = threading.Thread(target=get_status, name='Get deposit and withdraw status from bithumb,')
-        #update_thread = threading.Thread(target=get_update, name='Get latest coin network update from its dev site.')
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Exiting program")

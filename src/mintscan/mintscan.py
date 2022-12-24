@@ -44,7 +44,7 @@ def mintscan_scrape(coin, driver, delay = 5):
         if coin["post"] == "":
             logging.info(msg="First time running {} monitor. Inserting a latest post...".format(coin["name"]))
             update_post(latest_proposal, coin['name'])
-            return None
+            return "New"
         elif json.loads(coin["post"]) == latest_proposal:
             logging.info(msg="{} hasn't updated yet. Moving onto next coin...".format(coin["name"]))
             return None

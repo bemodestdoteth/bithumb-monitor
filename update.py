@@ -1,13 +1,16 @@
 from db import get_coin, get_all_coins
 from dotenv import load_dotenv
 from status import get_status
-from src.github.github import github_scrape
-from src.github_repo.github_repo import github_repo_scrape
-from src.mintscan.mintscan import mintscan_scrape
 import asyncio
 import telegram
 import time
 import os
+
+from src.github.github import github_scrape
+from src.github_repo.github_repo import github_repo_scrape
+from src.mintscan.mintscan import mintscan_scrape
+from src.xangle.xangle_token_swap import xangle_token_swap_scrape
+from src.xangle.xangle_token_rebrand import xangle_token_rebrand_scrape
 
 load_dotenv()
 
@@ -19,9 +22,10 @@ def scrape_func_selector(coin):
             return github_repo_scrape(coin)
         elif coin['source'] == "mintscan":
             return mintscan_scrape(coin)
+        else:
+            print("{}: Not updated yet.".format(coin['name']))
     except Exception as e:
         raise Exception(e)
-
 async def send_message(update_info):
     # Resolve reserved characters
     update_name = update_info['name']
@@ -39,13 +43,17 @@ def get_update():
         coins = get_all_coins()
         for coin in coins:
             result = scrape_func_selector(coin)
-            if result is not None:
+            if result is None:
+                print("{} has no further updates".format(coin['name']))
+            elif result == "New":
+                print("A new data has been inserted into {}".format(coin['name']))                
+            else:
                 print("{} has some update. Sending via telegram message...".format(result['name']))
                 asyncio.run(send_message(result))
-            else:
-                print("{} has no further updates".format(coin['name']))
+
+        # Look for xangle updates after looking through each token
+        xangle_token_swap_scrape()
+        xangle_token_rebrand_scrape()
 
         # 30 min cooldown after a successful scraping.
         time.sleep(1800)
-
-get_update()

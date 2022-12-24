@@ -75,7 +75,7 @@ def github_repo_scrape(coin):
             logging.info(msg="First time running {} monitor. Inserting file data...".format(coin["name"]))
             update_post(latest_files, coin['name'])
             s.close()
-            return None
+            return "New"
         elif json.loads(coin["post"]) == latest_files:
             logging.info(msg="{} hasn't updated yet. Moving onto next coin...".format(coin["name"]))
             s.close()

@@ -51,7 +51,7 @@ def github_scrape(coin, proxy, headers):
             logging.info(msg="First time running {} monitor. Inserting a latest post...".format(coin["name"]))
             update_post(latest_release, coin['name'])
             s.close()
-            return None
+            return "New"
         elif json.loads(coin["post"]) == latest_release:
             logging.info(msg="{} hasn't updated yet. Moving onto next coin...".format(coin["name"]))
             s.close()
@@ -68,4 +68,4 @@ def github_scrape(coin, proxy, headers):
         logging.info(msg = e)
         raise Exception(e)
     
-github_scrape(get_coin('EGLD'))
+#github_scrape(get_coin('EGLD'))
