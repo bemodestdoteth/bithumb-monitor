@@ -15,3 +15,4 @@ if __name__ == "__main__":
         print_n_log("Exiting program")
     except Exception as e:
         print_n_log(e, True)
+        raise Exception(e)

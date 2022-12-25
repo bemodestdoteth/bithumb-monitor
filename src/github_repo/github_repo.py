@@ -44,16 +44,13 @@ def github_repo_scrape(coin, proxy, headers):
 
     # First time scraping
     if coin["post"] == "":
-        print_n_log(msg="First time running {} monitor. Inserting file data...".format(coin["name"]))
         update_post(latest_files, coin['name'])
         s.close()
         return "New"
     elif json.loads(coin["post"]) == latest_files:
-        print_n_log(msg="{} hasn't updated yet. Moving onto next coin...".format(coin["name"]))
         s.close()
         return None
     else:
-        print_n_log(msg="{} has some updates. Now sharing via telegram...".format(coin["name"]))
         update_post(latest_files, coin['name'])
         s.close()
         # Return post to send telegram message

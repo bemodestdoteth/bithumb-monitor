@@ -113,8 +113,7 @@ def get_status():
 
             with open('./status.json','w') as f:
                 f.write(json.dumps(api_n))
-                logging.info(msg='Suucessfully fetched deposit and withdraw status.')
-                print_n_log('Sucessfully fetched deposit and withdraw status.')
+                print_n_log(msg='Suucessfully fetched deposit and withdraw status.')
                         
             ticker_timer = ticker_timer + 1
             proxy_timer = proxy_timer + 1

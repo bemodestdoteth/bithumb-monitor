@@ -29,7 +29,6 @@ def mintscan_scrape(coin, driver, delay = 5):
             'link': coin['link']
         }
 
-        print_n_log(msg="First time running {} monitor. Inserting a latest post...".format(coin["name"]))
         update_post(latest_proposal, coin['name'])
         return None
     else:
@@ -38,10 +37,8 @@ def mintscan_scrape(coin, driver, delay = 5):
         WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, 'div._header__logo_dfbb2')))
 
         if driver.find_element(by=By.CSS_SELECTOR, value='.div._noProposals_e5a94') is None:
-            print_n_log(msg="{} hasn't updated yet. Moving onto next coin...".format(coin["name"]))
             return None
         else:
-            print_n_log(msg="{} has some updates. Now sharing via telegram...".format(coin["name"]))
             update_post(latest_proposal, coin['name'])
 
         # Return post to send telegram message

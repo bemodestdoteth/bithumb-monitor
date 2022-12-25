@@ -37,16 +37,13 @@ def github_scrape(coin, proxy, headers):
 
     # First time scraping
     if coin["post"] == "":
-        print_n_log("First time running {} monitor. Inserting a latest post...".format(coin["name"]))
         update_post(latest_release, coin['name'])
         s.close()
         return "New"
     elif json.loads(coin["post"]) == latest_release:
-        print_n_log(msg="{} hasn't updated yet. Moving onto next coin...".format(coin["name"]))
         s.close()
         return None
     else:
-        print_n_log(msg="{} has some updates. Now sharing via telegram...".format(coin["name"]))
         update_post(latest_release, coin['name'])
         s.close()
 

@@ -63,11 +63,9 @@ def xangle_token_swap_scrape(coin, driver, delay = 5):
         item_site_comp = (item_rec[1], item_rec[5], item_rec[4], item_link)
 
         if item_db == item_site_comp:
-            print_n_log(msg="No new coin swap disclosure on xangle.")
             return None
         # Should only pass coins listed on Bithumb
         elif item_db[0] in (item for sublist in get_ticker().values() for item in sublist):
-            print_n_log(msg="New coin swap disclosure detected on xangle.")
 
             # Return post to send telegram message
             return {"name": item_site_comp[0], "title":item_site_comp[1], "link": item_site_comp[3] }

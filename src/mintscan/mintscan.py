@@ -30,14 +30,11 @@ def mintscan_scrape(coin, driver, delay = 5):
     
     # First time scraping
     if coin["post"] == "":
-        print_n_log(msg="First time running {} monitor. Inserting a latest post...".format(coin["name"]))
         update_post(latest_proposal, coin['name'])
         return "New"
     elif json.loads(coin["post"]) == latest_proposal:
-        print_n_log(msg="{} hasn't updated yet. Moving onto next coin...".format(coin["name"]))
         return None
     else:
-        print_n_log(msg="{} has some updates. Now sharing via telegram...".format(coin["name"]))
         update_post(latest_proposal, coin['name'])
 
         # Return post to send telegram message

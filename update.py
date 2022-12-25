@@ -24,7 +24,7 @@ def scrape_func_selector(coin):
         elif coin['source'] == "mintscan":
             return mintscan_scrape(coin)
         else:
-            print_n_log("Scraping {}: Not updated yet.".format(coin['name']))
+            return "Pass"
     except Exception as e:
         raise Exception(e)
 async def send_message(update_info):
@@ -41,7 +41,7 @@ async def send_message(update_info):
     await bot.sendMessage(chat_id=chat_id, text=msg, parse_mode='markdownv2')
 def get_update():
     # Check db existence before beginning
-    if not(os.path.isdir("coins.db")):
+    if not(os.path.isfile("coins.db")):
         print_n_log("No database detected. Creating new before moving on.")
         create_coins_db()
         create_xangle_swap_db()
@@ -52,6 +52,8 @@ def get_update():
             result = scrape_func_selector(coin)
             if result is None:
                 print_n_log("{} has no further updates".format(coin['name']))
+            elif result == "Pass":
+                print_n_log("Scraping {}: Not updated yet.".format(coin['name']))
             elif result == "New":
                 print_n_log("A new data has been inserted into {}".format(coin['name']))                
             else:
