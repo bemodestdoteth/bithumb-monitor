@@ -61,8 +61,8 @@ def get_update():
                 asyncio.run(send_message(result))
 
         # Look for xangle updates after looking through each token
-        xangle_token_swap_scrape("TOKEN SWAP DISCLOSURE")
-        xangle_token_rebrand_scrape("TOKEN REBRAND DISCLOSURE")
+        xangle_token_swap_scrape({"name": "TOKEN SWAP DISCLOSURE"})
+        xangle_token_rebrand_scrape({"name": "TOKEN REBRAND DISCLOSURE"})
 
         # 30 min cooldown after a successful scraping.
         print_n_log("Website updating job finished. Next job is projected at {}".format(datetime.strftime(datetime.now() + timedelta(minutes=30), format="%Y/%m/%d %H:%M:%S")))
