@@ -10,6 +10,7 @@ import os
 from src.github.github import github_scrape
 from src.github_repo.github_repo import github_repo_scrape
 from src.mintscan.mintscan import mintscan_scrape
+from src.xtz_agora.xtz_agora import xtz_agora_scrape
 from src.xangle.xangle_token_swap import xangle_token_swap_scrape
 from src.xangle.xangle_token_rebrand import xangle_token_rebrand_scrape
 
@@ -23,6 +24,8 @@ def scrape_func_selector(coin):
             return github_repo_scrape(coin)
         elif coin['source'] == "mintscan":
             return mintscan_scrape(coin)
+        elif coin['source'] == "xtz-agora":
+            return xtz_agora_scrape(coin)
         else:
             return "Pass"
     except Exception as e:

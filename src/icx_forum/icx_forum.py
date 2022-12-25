@@ -14,24 +14,20 @@ from config import prior_setup_selenium, print_n_log
 import json
 
 @prior_setup_selenium
-def xtz_agora_scrape(coin, driver, delay = 5):
+def icx_forum_scrape(coin, driver, delay = 5):
     # Storing post
-    base_url = "https://www.tezosagora.org/"
+    base_url = "https://forum.icon.community/"
 
     # Open website
     driver.get(coin["link"])
-    WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, 'div._agoraSelect_95594')))
-
-    # Open proposal combobox
-    driver.find_element(by=By.CSS_SELECTOR, value='div._agoraSelect_95594').click()
-    WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, 'div._agoraSelect__menu__item_95594')))
+    WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, 'span.topic-title')))
 
     # Topmost Proposal
-    current_proposal = driver.find_element(by=By.CSS_SELECTOR, value='div._agoraSelect__menu__item_95594').text
     latest_proposal = {
-        'title' : current_proposal,
-        'link': "{}period/{}".format(base_url, current_proposal[:2])
+        'title' : driver.find_element(by=By.CSS_SELECTOR, value='span.topic-title').text,
+        'link': driver.find_element(by=By.CSS_SELECTOR, value='a.search-link').get_attribute('href')
     }
+    print(latest_proposal)
     
     # First time scraping
     if coin["post"] == "":
@@ -47,4 +43,4 @@ def xtz_agora_scrape(coin, driver, delay = 5):
         return latest_proposal
 
 # Testing code
-xtz_agora_scrape(get_coin("XTZ"))
+icx_forum_scrape(get_coin("ICX"))

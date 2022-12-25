@@ -76,6 +76,7 @@ def update_post(post, coin):
     con = sqlite3.connect('coins.db')
     cur = con.cursor()
     query = "UPDATE coins SET post = ? WHERE name = ?"
+    #cur.execute(query, (post, coin))
     cur.execute(query, (json.dumps(post), coin))
     con.commit()
 
@@ -181,7 +182,7 @@ coins = {
     "groups": ""
     },"XTZ": {
     "source": "xtz-agora",
-    "link": "https://www.tezosagora.org/period/86",
+    "link": "https://www.tezosagora.org/period/",
     "post": "",
     "groups": ""
     },"ICX": {
@@ -285,3 +286,5 @@ coins = {
     "post": "",
     "groups": "OGN, GLM, WOZX, TRV, OCEAN, BOBA"
     }}
+
+#update_post('https://www.tezosagora.org/period', "XTZ")
