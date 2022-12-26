@@ -13,7 +13,7 @@ from db import get_coin, update_post
 from config import prior_setup_bs4, print_n_log
 
 @prior_setup_bs4
-def github_scrape(coin, proxy, headers):
+def github_wiki_scrape(coin, proxy, headers):
     '''
     Scrapes the site change database accordingly
     
@@ -25,34 +25,31 @@ def github_scrape(coin, proxy, headers):
 
     # Make request to site
     s = requests.Session()
-    
+
     html = s.get(coin["link"], headers=headers, proxies=proxy, verify=False, timeout=50)
     soup = BeautifulSoup(html.text, 'html.parser')
 
-    # With 'latest' tag
-    if coin["name"] == "XEC":
-        latest_release = {
-            'title' : soup.find('h1', attrs={"data-view-component": "true"}).text + " / Checkpoint every Nov 15th or May 15th, which is also around version 0.2x.5. Buy around then",
-            'link': base_url + soup.select('li.breadcrumb-item a[aria-current="page"]')[0]['href']
-        }
-    else:
-        latest_release = {
-            'title' : soup.find('h1', attrs={"data-view-component": "true"}).text,
-            'link': base_url + soup.select('li.breadcrumb-item a[aria-current="page"]')[0]['href']
-        }
+    file = soup.select('a.flex-1.py-1.text-bold')[-1]
+    latest_files = {
+        'title' : file.text,
+        'link': base_url + file['href']
+    }
 
     # First time scraping
     if coin["post"] == "":
-        update_post(latest_release, coin['name'])
+        update_post(latest_files, coin['name'])
         s.close()
         return "New"
-    elif json.loads(coin["post"]) == latest_release:
+    elif json.loads(coin["post"]) == latest_files:
         s.close()
         return None
     else:
-        update_post(latest_release, coin['name'])
+        update_post(latest_files, coin['name'])
         s.close()
 
         # Return post to send telegram message
-        latest_release['name'] = coin['name']
-        return latest_release
+        latest_files['name'] = coin['name']
+        return latest_files
+
+# Test Code
+#github_wiki_scrape(get_coin("CSPR"))

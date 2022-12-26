@@ -79,6 +79,12 @@ def update_post(post, coin):
     #cur.execute(query, (post, coin))
     cur.execute(query, (json.dumps(post), coin))
     con.commit()
+def overhaul_post(coin, name):
+    con = sqlite3.connect('coins.db')
+    cur = con.cursor()
+    query = "UPDATE coins SET source = ?, link = ?, post = ?, groups = ? WHERE name = ?"
+    cur.execute(query, (coin['source'], coin['link'], coin['post'], coin['groups'], name))
+    con.commit()
 
 # Need revision, low priority
 def update_config(coin, name=None, link=None, delay=None, details=None):
@@ -287,4 +293,11 @@ coins = {
     "groups": "OGN, GLM, WOZX, TRV, OCEAN, BOBA"
     }}
 
-#update_post('https://www.tezosagora.org/period', "XTZ")
+coin = {
+    "source": "github-wiki",
+    "link": "https://github.com/casper-network/casper-node/wiki",
+    "post": "",
+    "groups": ""
+    }
+
+#overhaul_post(coin, "CSPR")

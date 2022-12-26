@@ -14,15 +14,15 @@ from config import prior_setup_selenium, print_n_log
 import json
 
 @prior_setup_selenium
-def icx_forum_scrape(coin, driver, delay = 5):
+def xangle_scrape(coin, driver, delay = 5):
     # Open website
     driver.get(coin["link"])
-    WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, 'span.topic-title')))
+    WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, '.bc-insight-list-item-wrapper')))
 
     # Topmost Proposal
     latest_proposal = {
-        'title' : driver.find_element(by=By.CSS_SELECTOR, value='span.topic-title').text,
-        'link': driver.find_element(by=By.CSS_SELECTOR, value='a.search-link').get_attribute('href')
+        'title' : driver.find_element(by=By.CSS_SELECTOR, value='p.title.mt8').text,
+        'link': driver.find_element(by=By.CSS_SELECTOR, value='.bc-insight-list-item-wrapper').get_attribute('href')
     }
     print(latest_proposal)
     
@@ -38,6 +38,6 @@ def icx_forum_scrape(coin, driver, delay = 5):
         # Return post to send telegram message
         latest_proposal['name'] = coin['name']
         return latest_proposal
-
+    
 # Testing code
-#icx_forum_scrape(get_coin("ICX"))
+#xangle_scrape(get_coin("ETC"))

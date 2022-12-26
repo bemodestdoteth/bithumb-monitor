@@ -14,23 +14,25 @@ from config import prior_setup_selenium, print_n_log
 import json
 
 @prior_setup_selenium
-def icx_forum_scrape(coin, driver, delay = 5):
+def snx_blog_scrape(coin, driver, delay = 5):
+    # Storing post
+    base_url = "https://blog.synthetix.io/"
+
     # Open website
     driver.get(coin["link"])
-    WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, 'span.topic-title')))
+    WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, 'div ~ h2.post-card-title')))
 
     # Topmost Proposal
     latest_proposal = {
-        'title' : driver.find_element(by=By.CSS_SELECTOR, value='span.topic-title').text,
-        'link': driver.find_element(by=By.CSS_SELECTOR, value='a.search-link').get_attribute('href')
+        'title' : driver.find_element(by=By.CSS_SELECTOR, value='div ~ h2.post-card-title').text,
+        'link': driver.find_element(by=By.CSS_SELECTOR, value='a.post-card-content-link').get_attribute('href')
     }
-    print(latest_proposal)
     
     # First time scraping
     if coin["post"] == "":
         update_post(latest_proposal, coin['name'])
         return "New"
-    elif json.loads(coin["post"]) == latest_proposal:
+    elif json.loads(coin["post"]) == latest_proposal or "release" not in latest_proposal['title'].lower():
         return None
     else:
         update_post(latest_proposal, coin['name'])
@@ -40,4 +42,4 @@ def icx_forum_scrape(coin, driver, delay = 5):
         return latest_proposal
 
 # Testing code
-#icx_forum_scrape(get_coin("ICX"))
+#snx_blog_scrape(get_coin("SNX"))

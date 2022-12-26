@@ -4,6 +4,7 @@ from random_user_agent.params import SoftwareName, HardwareType, OperatingSystem
 
 # FreeProxy for preventing IP ban
 from fp.fp import FreeProxy
+from proxy_randomizer import RegisteredProviders
 
 from selenium import webdriver
 from datetime import datetime
@@ -36,14 +37,18 @@ def prior_setup_selenium(func):
         software_names = [SoftwareName.CHROME.value]
         hardware_type = [HardwareType.COMPUTER]
         user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hardware_type)
+        agent = user_agent_rotator.get_random_user_agent()
 
         # To-do: add https proxy suppport
-        proxy = FreeProxy().get().replace("http://", "")
-        print(proxy)
-        headers = user_agent_rotator.get_random_user_agent()
-
+        proxl = FreeProxy().get().replace("http://", "")
+        #rp = RegisteredProviders()
+        #rp.parse_providers()
+        #prox = rp.get_random_proxy()
+        #proxl = "{}:{}".format(prox.ip_address, prox.port)
+        print(proxl)
+        
         # Open website
-        driver = os_selection(proxy = proxy, user_agent = headers)
+        driver = os_selection(proxy = proxl, user_agent = agent)
         return func(coin, driver, delay = 5)
     return inner
 def os_selection(proxy, user_agent):
@@ -79,16 +84,15 @@ def os_selection(proxy, user_agent):
         Preserve user cookies
         t.ly/uDkv
         '''
+    '''
     webdriver.DesiredCapabilities.CHROME['proxy'] = {
     "httpProxy": proxy,
     "ftpProxy": proxy,
     "sslProxy": proxy,
     "proxyType": "MANUAL",
     }
-    webdriver.DesiredCapabilities.CHROME['acceptSslCerts']=True
+    '''
     driver = webdriver.Chrome(options=chrome_options)
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-    driver.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": user_agent})
     return driver
 def update_chromedriver():
     if os.name == 'posix': # Only on linux

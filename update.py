@@ -9,8 +9,12 @@ import os
 
 from src.github.github import github_scrape
 from src.github_repo.github_repo import github_repo_scrape
+from src.github_wiki.github_wiki import github_wiki_scrape
+from src.icx_forum.icx_forum import icx_forum_scrape
 from src.mintscan.mintscan import mintscan_scrape
+from src.snx_blog.snx_blog import snx_blog_scrape
 from src.xtz_agora.xtz_agora import xtz_agora_scrape
+from src.xangle.xangle import xangle_scrape
 from src.xangle.xangle_token_swap import xangle_token_swap_scrape
 from src.xangle.xangle_token_rebrand import xangle_token_rebrand_scrape
 
@@ -22,8 +26,16 @@ def scrape_func_selector(coin):
             return github_scrape(coin)
         elif coin['source'] == "github-repo":
             return github_repo_scrape(coin)
+        elif coin['source'] == "icx-forum":
+            return icx_forum_scrape(coin)
+        elif coin['source'] == "github-wiki":
+            return github_wiki_scrape(coin)
         elif coin['source'] == "mintscan":
             return mintscan_scrape(coin)
+        elif coin['source'] == "snx-blog":
+            return snx_blog_scrape(coin)
+        elif coin['source'] == "xangle":
+            return xangle_scrape(coin)
         elif coin['source'] == "xtz-agora":
             return xtz_agora_scrape(coin)
         else:
@@ -50,23 +62,29 @@ def get_update():
         create_xangle_swap_db()
         create_xangle_rebrand_db()
     while True:
-        coins = get_all_coins()
-        for coin in coins:
-            result = scrape_func_selector(coin)
-            if result is None:
-                print_n_log("{} has no further updates".format(coin['name']))
-            elif result == "Pass":
-                print_n_log("Scraping {}: Not updated yet.".format(coin['name']))
-            elif result == "New":
-                print_n_log("A new data has been inserted into {}".format(coin['name']))                
-            else:
-                print_n_log("{} has some update. Sending via telegram message...".format(result['name']))
-                asyncio.run(send_message(result))
+        try:
+            coins = get_all_coins()
+            for coin in coins:
+                result = scrape_func_selector(coin)
+                if result is None:
+                    print_n_log("{} has no further updates".format(coin['name']))
+                elif result == "Pass":
+                    print_n_log("Scraping {}: Not updated yet.".format(coin['name']))
+                elif result == "New":
+                    print_n_log("A new data has been inserted into {}".format(coin['name']))                
+                else:
+                    print_n_log("{} has some update. Sending via telegram message...".format(result['name']))
+                    asyncio.run(send_message(result))
 
-        # Look for xangle updates after looking through each token
-        xangle_token_swap_scrape({"name": "TOKEN SWAP DISCLOSURE"})
-        xangle_token_rebrand_scrape({"name": "TOKEN REBRAND DISCLOSURE"})
+            # Look for xangle updates after looking through each token
+            xangle_token_swap_scrape({"name": "TOKEN SWAP DISCLOSURE"})
+            xangle_token_rebrand_scrape({"name": "TOKEN REBRAND DISCLOSURE"})
 
-        # 30 min cooldown after a successful scraping.
-        print_n_log("Website updating job finished. Next job is projected at {}".format(datetime.strftime(datetime.now() + timedelta(minutes=30), format="%Y/%m/%d %H:%M:%S")))
-        time.sleep(1800)
+            # 30 min cooldown after a successful scraping.
+            print_n_log("Website updating job finished. Next job is projected at {}".format(datetime.strftime(datetime.now() + timedelta(minutes=30), format="%Y/%m/%d %H:%M:%S")))
+            time.sleep(1800)
+        except Exception as e:
+            raise Exception(e)
+
+# Test Function
+get_update()

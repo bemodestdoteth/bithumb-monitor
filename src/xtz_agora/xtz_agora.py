@@ -47,4 +47,4 @@ def xtz_agora_scrape(coin, driver, delay = 5):
         return latest_proposal
 
 # Testing code
-xtz_agora_scrape(get_coin("XTZ"))
+#xtz_agora_scrape(get_coin("XTZ"))
