@@ -38,7 +38,7 @@ def prior_setup_bs4(func):
         return func(coin, proxl, headers)
     return inner
 def prior_setup_selenium(func):
-    def inner(coin, delay = 30):
+    def inner(coin, delay = 15):
         print("-----------------------------------------")
         print_n_log("NOW WATCHING {}".format(coin['name']))
         print("-----------------------------------------")
@@ -130,9 +130,9 @@ def update_chromedriver():
 def print_n_log(msg, is_error = False):
     if not(is_error):
         print("{}  {}".format(datetime.strftime(datetime.now(), format="%Y/%m/%d %H:%M:%S"), msg))
-        logging.basicConfig(filename='./scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
+        logging.basicConfig(filename='./scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.INFO)
         logging.info(msg)
     else:
         print("{}  Error: {}".format(datetime.strftime(datetime.now(), format="%Y/%m/%d %H:%M:%S"), msg))
-        logging.basicConfig(filename='./scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.DEBUG)
+        logging.basicConfig(filename='./scraping.log', filemode='a', format='%(asctime)s - %(name)s - %(message)s', level=logging.ERROR)
         logging.error(msg)
