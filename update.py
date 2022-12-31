@@ -58,9 +58,9 @@ async def send_error_message(msg):
     # Telegram bot configuration
     bot = telegram.Bot(token = os.environ['TELEGRAM_BOT_TOKEN'])
     chat_id = os.environ['TELEGRAM_CHAT_ID']
-
-    nsg = 
-    await bot.sendMessage(chat_id=chat_id, text=msg, parse_mode='markdownv2')    
+    
+    msg_2 = "🚫An error occurred while working\!\!🚫\n{}".format(msg)
+    await bot.sendMessage(chat_id=chat_id, text=msg_2, parse_mode='markdownv2')    
 def get_update():
     # Check db existence before beginning
     if not(os.path.isfile("coins.db")):
