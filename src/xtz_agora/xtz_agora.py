@@ -29,6 +29,8 @@ def xtz_agora_scrape(coin, driver, delay = 5):
         'link': "{}period/{}".format(base_url, current_proposal[:2])
     }
     
+    driver.quit()
+
     # First time scraping
     if coin["post"] == "":
         update_post(latest_proposal, coin['name'])
@@ -37,7 +39,6 @@ def xtz_agora_scrape(coin, driver, delay = 5):
         return None
     else:
         update_post(latest_proposal, coin['name'])
-
         # Return post to send telegram message
         latest_proposal['name'] = coin['name']
         return latest_proposal

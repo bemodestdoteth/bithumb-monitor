@@ -18,6 +18,8 @@ def snx_blog_scrape(coin, driver, delay = 5):
         'title' : driver.find_element(by=By.CSS_SELECTOR, value='div ~ h2.post-card-title').text,
         'link': driver.find_element(by=By.CSS_SELECTOR, value='a.post-card-content-link').get_attribute('href')
     }
+
+    driver.quit()
     
     # First time scraping
     if coin["post"] == "":

@@ -41,18 +41,16 @@ def github_scrape(coin, proxy, headers):
             'link': base_url + soup.select('li.breadcrumb-item a[aria-current="page"]')[0]['href']
         }
 
+    s.close()
+    
     # First time scraping
     if coin["post"] == "":
         update_post(latest_release, coin['name'])
-        s.close()
         return "New"
     elif json.loads(coin["post"]) == latest_release:
-        s.close()
         return None
     else:
         update_post(latest_release, coin['name'])
-        s.close()
-
         # Return post to send telegram message
         latest_release['name'] = coin['name']
         return latest_release

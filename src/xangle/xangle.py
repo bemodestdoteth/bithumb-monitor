@@ -18,6 +18,8 @@ def xangle_scrape(coin, driver, delay = 30):
         'title' : driver.find_element(by=By.CSS_SELECTOR, value='p.title.mt8').text,
         'link': driver.find_element(by=By.CSS_SELECTOR, value='.bc-insight-list-item-wrapper').get_attribute('href')
     }
+
+    driver.quit()
     
     # First time scraping
     if coin["post"] == "":

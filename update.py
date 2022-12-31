@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from db import get_all_coins, create_coins_db, create_xangle_rebrand_db, create_xangle_swap_db
+from db import get_all_coins, create_coins_db, create_xangle_rebrand_db, create_xangle_swap_db, create_proxy_db
 from dotenv import load_dotenv
 from config import print_n_log
 import asyncio
@@ -68,6 +68,7 @@ def get_update():
         create_coins_db()
         create_xangle_swap_db()
         create_xangle_rebrand_db()
+        create_proxy_db()
     while True:
         coins = get_all_coins()
         for coin in coins:

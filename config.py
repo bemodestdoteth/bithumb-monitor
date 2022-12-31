@@ -68,6 +68,7 @@ def prior_setup_selenium(func):
                 break
             except TimeoutException:
                 print_n_log("Connection with proxy failed for TimeoutException. Trying again...")
+                driver.quit()
                 error_cnt = error_cnt + 1
                 if error_cnt >= 3:
                     print_n_log("Changing proxy due to concurrent errors...")
@@ -76,9 +77,9 @@ def prior_setup_selenium(func):
                     proxl = FreeProxy(rand=True).get().replace("http://", "")
                     print_n_log("Now connected to: {}".format(proxl))
                     error_cnt = 0
-                driver.quit()
             except WebDriverException:
                 print_n_log("Connection with proxy failed for WebDriverException. Trying again...")
+                driver.quit()
                 error_cnt = error_cnt + 1
                 if error_cnt >= 3:
                     print_n_log("Changing proxy due to concurrent errors...")
@@ -87,7 +88,6 @@ def prior_setup_selenium(func):
                     proxl = FreeProxy(rand=True).get().replace("http://", "")
                     print_n_log("Now connected to: {}".format(proxl))
                     error_cnt = 0
-                driver.quit()
         
         return func(coin, driver, delay = 5)
     return inner
@@ -96,7 +96,6 @@ def os_selection(proxy, user_agent):
     # Selenium on Linux
     if os.name == 'posix':
         # Bypass headless block
-        chrome_options.page_load_strategy = 'eager'
         chrome_options.add_argument('--headless')
         chrome_options.add_argument("--incognito")
         chrome_options.add_argument("--no-sandbox")
@@ -104,7 +103,6 @@ def os_selection(proxy, user_agent):
         chrome_options.add_argument('--start-maximized')
         chrome_options.add_argument("--enable-javascript")
         chrome_options.add_argument('--window-size=1920, 1080')
-        chrome_options.add_argument('--allow-running-insecure-content')
         chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
         chrome_options.add_experimental_option('useAutomationExtension', False)
         chrome_options.add_argument('--disable-blink-features=AutomationControlled')

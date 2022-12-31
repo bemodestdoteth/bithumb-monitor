@@ -19,6 +19,8 @@ def icx_forum_scrape(coin, driver, delay = 5):
         'link': driver.find_element(by=By.CSS_SELECTOR, value='a.search-link').get_attribute('href')
     }
 
+    driver.quit()
+
     # First time scraping
     if coin["post"] == "":
         update_post(latest_proposal, coin['name'])

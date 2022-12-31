@@ -56,6 +56,8 @@ def xangle_token_rebrand_scrape(coin, driver, delay = 5):
         item_link = item.get_attribute('href')
         item_site_comp = (item_rec[1], item_rec[5], item_rec[4], item_link)
 
+        driver.quit()
+
         if item_db == item_site_comp:
             print_n_log(msg="No new coin rebrand disclosure on xangle.")
             return None

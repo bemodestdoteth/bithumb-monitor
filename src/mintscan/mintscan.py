@@ -18,6 +18,8 @@ def mintscan_scrape(coin, driver, delay = 5):
         'title' : driver.find_element(by=By.CSS_SELECTOR, value='div h2').text,
         'link': driver.find_element(by=By.CSS_SELECTOR, value='div.ProposalCard_rightArrowWrapper__3lX_p a.ProposalCard_link__38deC').get_attribute('href')
     }
+
+    driver.quit()
     
     # First time scraping
     if coin["post"] == "":
