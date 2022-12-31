@@ -22,7 +22,7 @@ def empty_database():
         con.close()
         return False
 @prior_setup_selenium
-def xangle_token_swap_scrape(coin, driver, delay = 5):
+def xangle_token_swap_scrape(coin, driver, delay):
     '''
     Scrapes the site and changes database accordingly
     '''

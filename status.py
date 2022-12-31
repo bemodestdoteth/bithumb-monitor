@@ -5,6 +5,7 @@ from fp.fp import FreeProxy
 from pybithumb import Bithumb
 from dotenv import load_dotenv
 from config import print_n_log
+from db import get_working_proxy
 
 import json
 import logging
@@ -15,13 +16,6 @@ import time
 # Environment Variables
 load_dotenv()
 
-def get_proxy():
-    # Random Proxy
-    proxy_obj = FreeProxy()
-
-    # To-do: add https proxy suppport
-    proxy = {'http': proxy_obj.get()}
-    return proxy
 def maesoo(coin): # Not using right now
     bithumb = Bithumb(os.environ['CONNECT_KEY'], os.environ['SECRET_KEY'])
 
@@ -82,7 +76,7 @@ def get_status():
 
     proxy_timer = 0
     ticker_timer = 0
-    proxy = get_proxy()
+    proxy = get_working_proxy()
     tickers = get_ticker()
 
     while True:
@@ -126,7 +120,7 @@ def get_status():
             # Change proxy every 10 minutes
             if proxy_timer >= 300:
                 print_n_log('Proxy change timer reached. Changing proxy...')
-                proxy = get_proxy()
+                proxy = get_working_proxy()
                 print_n_log('Proxy changed. A new proxy is: {}'.format(proxy['http']))
                 proxy_timer = 0
 

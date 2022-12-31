@@ -14,7 +14,7 @@ from config import prior_setup_selenium
 import json
 
 @prior_setup_selenium
-def xtz_agora_scrape(coin, driver, delay = 5):
+def xtz_agora_scrape(coin, driver, delay):
     # Storing post
     base_url = "https://www.tezosagora.org/"
 
@@ -44,4 +44,4 @@ def xtz_agora_scrape(coin, driver, delay = 5):
         return latest_proposal
 
 # Testing code
-#xtz_agora_scrape(get_coin("XTZ"))
+xtz_agora_scrape(get_coin("XTZ"))

@@ -12,7 +12,7 @@ from config import prior_setup_selenium
 import json
 
 @prior_setup_selenium
-def mintscan_scrape(coin, driver, delay = 5):
+def mintscan_scrape(coin, driver, delay):
     # Topmost Proposal
     latest_proposal = {
         'title' : driver.find_element(by=By.CSS_SELECTOR, value='div h2').text,

@@ -38,7 +38,7 @@ def prior_setup_bs4(func):
         return func(coin, proxl, headers)
     return inner
 def prior_setup_selenium(func):
-    def inner(coin, delay = 5):
+    def inner(coin, delay = 30):
         print("-----------------------------------------")
         print_n_log("NOW WATCHING {}".format(coin['name']))
         print("-----------------------------------------")
@@ -89,7 +89,7 @@ def prior_setup_selenium(func):
                     print_n_log("Now connected to: {}".format(proxl))
                     error_cnt = 0
         
-        return func(coin, driver, delay = 5)
+        return func(coin, driver, delay)
     return inner
 def os_selection(proxy, user_agent):
     chrome_options = webdriver.ChromeOptions()
