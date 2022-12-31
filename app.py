@@ -1,5 +1,5 @@
 from status import get_status
-from update import get_update
+from update import get_update, send_error_message
 from config import print_n_log
 from concurrent.futures import ThreadPoolExecutor
 
@@ -15,4 +15,5 @@ if __name__ == "__main__":
         print_n_log("Exiting program")
     except Exception as e:
         print_n_log(e, True)
+        send_error_message(e)
         raise Exception(e)

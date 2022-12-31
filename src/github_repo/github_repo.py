@@ -26,7 +26,7 @@ def github_repo_scrape(coin, proxy, headers):
     # Make request to site
     s = requests.Session()
 
-    html = s.get(coin["link"], headers=headers, proxies=proxy, verify=False, timeout=50)
+    html = s.get(coin["link"], headers=headers, proxies={"http": proxy}, verify=False, timeout=50)
     soup = BeautifulSoup(html.text, 'html.parser')
 
     # Fetch every file from the directory

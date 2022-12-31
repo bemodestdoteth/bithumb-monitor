@@ -1,6 +1,4 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 # Import file from parent directory
 from pathlib import Path
@@ -28,10 +26,6 @@ def xangle_token_swap_scrape(coin, driver, delay = 5):
     '''
     Scrapes the site and changes database accordingly
     '''
-    url = "https://xangle.io/insight/disclosure?category=token_swap"
-    driver.get(url)
-    WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, '.bc-insight-list-item-wrapper')))
-
     # First time scraping
     if empty_database():
         # Get records from the site

@@ -1,11 +1,16 @@
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import WebDriverException, TimeoutException
+
 # Random user agents to deceive server
 from random_user_agent.user_agent import UserAgent
-from random_user_agent.params import SoftwareName, HardwareType, OperatingSystem
+from random_user_agent.params import SoftwareName, HardwareType
 
 # FreeProxy for preventing IP ban
 from fp.fp import FreeProxy
-from proxy_randomizer import RegisteredProviders
 
+from db import get_working_proxy, write_proxy, delete_proxy
 from selenium import webdriver
 from datetime import datetime
 import logging
@@ -22,13 +27,18 @@ def prior_setup_bs4(func):
         hardware_type = [HardwareType.COMPUTER]
         user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hardware_type)
 
-        # To-do: add https proxy suppport
-        proxy = {'http': FreeProxy().get()}
+        # First time setting proxy
+        if get_working_proxy() is None:
+            proxl = FreeProxy(rand=True).get().replace("http://", "")
+        else:
+            proxl = get_working_proxy()
+
+        print_n_log("Connected to: {}".format(proxl))
         headers = {'User-Agent': user_agent_rotator.get_random_user_agent()}
-        return func(coin, proxy, headers)
+        return func(coin, proxl, headers)
     return inner
 def prior_setup_selenium(func):
-    def inner(coin):
+    def inner(coin, delay = 5):
         print("-----------------------------------------")
         print_n_log("NOW WATCHING {}".format(coin['name']))
         print("-----------------------------------------")
@@ -38,17 +48,47 @@ def prior_setup_selenium(func):
         hardware_type = [HardwareType.COMPUTER]
         user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hardware_type)
         agent = user_agent_rotator.get_random_user_agent()
+        error_cnt = 0
 
-        # To-do: add https proxy suppport
-        proxl = FreeProxy().get().replace("http://", "")
-        #rp = RegisteredProviders()
-        #rp.parse_providers()
-        #prox = rp.get_random_proxy()
-        #proxl = "{}:{}".format(prox.ip_address, prox.port)
-        print(proxl)
+        # First time setting proxy
+        if get_working_proxy() is None:
+            proxl = FreeProxy(rand=True).get().replace("http://", "")
+            print_n_log("Connected to: {}".format(proxl))
+        else:
+            proxl = get_working_proxy()
+            print_n_log("Connected to: {}".format(proxl))
+
+        # Open website and handle errors
+        while True:
+            try:
+                driver = os_selection(proxy = proxl, user_agent = agent)
+                driver.get(coin['link'])
+                WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, coin["selector"])))
+                write_proxy(proxl)
+                break
+            except TimeoutException:
+                print_n_log("Connection with proxy failed for TimeoutException. Trying again...")
+                error_cnt = error_cnt + 1
+                if error_cnt >= 3:
+                    print_n_log("Changing proxy due to concurrent errors...")
+                    delete_proxy(proxl)
+                    
+                    proxl = FreeProxy(rand=True).get().replace("http://", "")
+                    print_n_log("Now connected to: {}".format(proxl))
+                    error_cnt = 0
+                driver.quit()
+            except WebDriverException:
+                print_n_log("Connection with proxy failed for WebDriverException. Trying again...")
+                error_cnt = error_cnt + 1
+                if error_cnt >= 3:
+                    print_n_log("Changing proxy due to concurrent errors...")
+                    delete_proxy(proxl)
+                    
+                    proxl = FreeProxy(rand=True).get().replace("http://", "")
+                    print_n_log("Now connected to: {}".format(proxl))
+                    error_cnt = 0
+                driver.quit()
         
-        # Open website
-        driver = os_selection(proxy = proxl, user_agent = agent)
         return func(coin, driver, delay = 5)
     return inner
 def os_selection(proxy, user_agent):
@@ -84,14 +124,6 @@ def os_selection(proxy, user_agent):
         Preserve user cookies
         t.ly/uDkv
         '''
-    '''
-    webdriver.DesiredCapabilities.CHROME['proxy'] = {
-    "httpProxy": proxy,
-    "ftpProxy": proxy,
-    "sslProxy": proxy,
-    "proxyType": "MANUAL",
-    }
-    '''
     driver = webdriver.Chrome(options=chrome_options)
     return driver
 def update_chromedriver():

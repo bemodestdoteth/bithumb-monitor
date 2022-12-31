@@ -26,7 +26,7 @@ def github_scrape(coin, proxy, headers):
     # Make request to site
     s = requests.Session()
     
-    html = s.get(coin["link"], headers=headers, proxies=proxy, verify=False, timeout=50)
+    html = s.get(coin["link"], headers=headers, proxies={"http": proxy}, verify=False, timeout=50)
     soup = BeautifulSoup(html.text, 'html.parser')
 
     # With 'latest' tag
@@ -56,3 +56,5 @@ def github_scrape(coin, proxy, headers):
         # Return post to send telegram message
         latest_release['name'] = coin['name']
         return latest_release
+
+#github_scrape(get_coin("XEC"))

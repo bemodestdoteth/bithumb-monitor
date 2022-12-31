@@ -10,17 +10,13 @@ os.chdir(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 
 from db import get_coin, update_post
-from config import prior_setup_selenium, print_n_log
+from config import prior_setup_selenium
 import json
 
 @prior_setup_selenium
 def xtz_agora_scrape(coin, driver, delay = 5):
     # Storing post
     base_url = "https://www.tezosagora.org/"
-
-    # Open website
-    driver.get(coin["link"])
-    WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, 'div._agoraSelect_95594')))
 
     # Open proposal combobox
     driver.find_element(by=By.CSS_SELECTOR, value='div._agoraSelect_95594').click()

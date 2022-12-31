@@ -10,7 +10,8 @@
 9. PROFIT
 
 ### Roadmap
-1. Support announcement scraping for more coins
-2. Better logging and monitoring
-3. Upbit compatible
-4. Remake as CLI
+1. Support announcement scraping for more coins [✓]
+2. Better logging and monitoring [✓]
+3. Resolve selenium proxy error
+4. Upbit compatible
+5. CLI for better serviceability

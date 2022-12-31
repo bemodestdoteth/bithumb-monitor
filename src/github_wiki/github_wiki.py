@@ -10,7 +10,7 @@ os.chdir(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 
 from db import get_coin, update_post
-from config import prior_setup_bs4, print_n_log
+from config import prior_setup_bs4
 
 @prior_setup_bs4
 def github_wiki_scrape(coin, proxy, headers):
@@ -26,7 +26,7 @@ def github_wiki_scrape(coin, proxy, headers):
     # Make request to site
     s = requests.Session()
 
-    html = s.get(coin["link"], headers=headers, proxies=proxy, verify=False, timeout=50)
+    html = s.get(coin["link"], headers=headers, proxies={"http": proxy}, verify=False, timeout=50)
     soup = BeautifulSoup(html.text, 'html.parser')
 
     file = soup.select('a.flex-1.py-1.text-bold')[-1]
