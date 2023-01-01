@@ -5,9 +5,9 @@ from concurrent.futures import ThreadPoolExecutor
 import psutil
 
 def main():
-    # Set the maximum amount of memory that can be used to 100 MB
-    memory_limit = 1024 * 1024 * 1024
-    psutil.Process().rlimit(psutil.RLIMIT_AS, (memory_limit, memory_limit))
+    # Memory limit for test purpose
+    #memory_limit = 1024 * 1024 * 1024
+    #psutil.Process().rlimit(psutil.RLIMIT_AS, (memory_limit, memory_limit))
     
     with ThreadPoolExecutor() as executor:
         executor.submit(get_status)
