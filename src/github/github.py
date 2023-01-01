@@ -13,7 +13,7 @@ from db import get_coin, update_post
 from config import prior_setup_bs4, print_n_log
 
 @prior_setup_bs4
-def github_scrape(coin, proxy, headers):
+def github_scrape(coin, proxy):
     '''
     Scrapes the site change database accordingly
     
@@ -26,7 +26,7 @@ def github_scrape(coin, proxy, headers):
     # Make request to site
     s = requests.Session()
     
-    html = s.get(coin["link"], headers=headers, proxies={"http": proxy}, verify=False, timeout=50)
+    html = s.get(coin["link"], proxies={"http": proxy}, verify=False, timeout=50)
     soup = BeautifulSoup(html.text, 'html.parser')
 
     # With 'latest' tag
@@ -55,4 +55,5 @@ def github_scrape(coin, proxy, headers):
         latest_release['name'] = coin['name']
         return latest_release
 
-#github_scrape(get_coin("XEC"))
+if __name__ == "__main__":
+    github_scrape(get_coin("XEC"))

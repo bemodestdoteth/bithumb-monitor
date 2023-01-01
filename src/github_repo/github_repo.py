@@ -13,7 +13,7 @@ from db import get_coin, update_post
 from config import prior_setup_bs4, print_n_log
 
 @prior_setup_bs4
-def github_repo_scrape(coin, proxy, headers):
+def github_repo_scrape(coin, proxy):
     '''
     Scrapes the site change database accordingly
     
@@ -26,7 +26,7 @@ def github_repo_scrape(coin, proxy, headers):
     # Make request to site
     s = requests.Session()
 
-    html = s.get(coin["link"], headers=headers, proxies={"http": proxy}, verify=False, timeout=50)
+    html = s.get(coin["link"], proxies={"http": proxy}, verify=False, timeout=50)
     soup = BeautifulSoup(html.text, 'html.parser')
 
     # Fetch every file from the directory
@@ -42,16 +42,15 @@ def github_repo_scrape(coin, proxy, headers):
             "link": links[i],
         }
 
+    s.close()
+
     # First time scraping
     if coin["post"] == "":
         update_post(latest_files, coin['name'])
-        s.close()
         return "New"
     elif json.loads(coin["post"]) == latest_files:
-        s.close()
         return None
     else:
         update_post(latest_files, coin['name'])
-        s.close()
         # Return post to send telegram message
         return {'name': coin['name'], 'title': "See what has been committed in the link.", 'link': coin['link']}

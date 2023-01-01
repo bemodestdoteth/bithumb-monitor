@@ -44,4 +44,5 @@ def xtz_agora_scrape(coin, driver, delay):
         return latest_proposal
 
 # Testing code
-#xtz_agora_scrape(get_coin("XTZ"))
+if __name__ == "__main__":
+    xtz_agora_scrape(get_coin("XTZ"))

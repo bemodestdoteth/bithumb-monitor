@@ -7,7 +7,7 @@ import sys
 os.chdir(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent.absolute()))
 
-from status import get_ticker
+from db import get_ticker
 from config import prior_setup_selenium, print_n_log
 import sqlite3
 

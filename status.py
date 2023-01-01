@@ -1,15 +1,11 @@
-# FreeProxy for preventing IP ban
-from fp.fp import FreeProxy
-
-# FreeProxy for preventing IP ban
 from pybithumb import Bithumb
 from dotenv import load_dotenv
-from db import get_all_coins
+from db import get_working_proxy, get_ticker, get_buy_sell_coins
 from config import print_n_log
-from db import get_working_proxy
+from update import send_error_message
 
+import asyncio
 import json
-import logging
 import os
 import requests
 import time
@@ -67,79 +63,66 @@ def maedo(coin):
             print_n_log(result)
         else:
             print_n_log('You don\'t hane {} in your balances. Skip selling...'.format(coin))
-def get_ticker():
-    tickers = {}
-    omits = ['BTC', 'ETH', 'XRP', 'BCH', 'EOS', 'TRX']
-    tickers["KRW"] = Bithumb.get_tickers('KRW')
-    tickers["BTC"] = list((btc_ticker for btc_ticker in Bithumb.get_tickers('btc') if btc_ticker not in tickers['KRW']))
-    return tickers
-def get_buy_sell_coins():
-    coin_list = []
-    for coin in get_all_coins():
-        if coin["groups"] != "":
-            (coin_list.append(*group) for group in coin["groups"].split(","))
-        else:
-            coin_list.append(coin["name"])
-    return coin_list
 def get_status():
-    url = "https://api.bithumb.com/public/assetsstatus/ALL"
-    headers = {"accept": "application/json"}
+    try:
+        url = "https://api.bithumb.com/public/assetsstatus/ALL"
+        headers = {"accept": "application/json"}
 
-    proxy_timer = 0
-    ticker_timer = 0
-    proxy = get_working_proxy()
-    #tickers = get_ticker()
-    coin_list = get_buy_sell_coins()
+        proxy_timer = 0
+        ticker_timer = 0
+        proxy = get_working_proxy()
+        #tickers = get_ticker()
+        coin_list = get_buy_sell_coins()
 
-    while True:
-        try:
-            response = requests.get(url,proxies={"http": proxy}, headers=headers)
-            api_n = json.loads(response.text)['data']
+        while True:
+                response = requests.get(url,proxies={"http": proxy}, headers=headers)
+                api_n = json.loads(response.text)['data']
 
-            # If there's no status.json, skip the whole process and save the first result as status.json
-            if os.path.isfile('./status.json'):
-                with open('./status.json','r') as f:
-                    api_o = json.loads(f.readline())
+                # If there's no status.json, skip the whole process and save the first result as status.json
+                if os.path.isfile('./status.json'):
+                    with open('./status.json','r') as f:
+                        api_o = json.loads(f.readline())
 
-                for coin in api_n.keys():
-                    if coin not in tuple(api_o.keys()):
-                        print_n_log('New coin: {}'.format(coin))
+                    for coin in api_n.keys():
+                        if coin not in tuple(api_o.keys()):
+                            print_n_log('New coin: {}'.format(coin))
 
-                    elif api_n[coin] != api_o[coin]:
-                        if api_n[coin]['withdrawal_status'] == 0:
-                        #if api_n[coin]['withdrawal_status'] == 1:
-                            if coin in coin_list:
-                                print_n_log('{} withdrawal closed.'.format(coin, coin))
-                                maedo(coin)
-                        elif api_n[coin]['withdrawal_status'] == 0:
-                            if coin in coin_list:
-                                print_n_log('{} withdrawal opened'.format(coin))
-                                #print_n_log('Selling {}...'.format(coin))
-                                #maesoo(coin)
+                        elif api_n[coin] != api_o[coin]:
+                            if api_n[coin]['withdrawal_status'] == 0:
+                            #if api_n[coin]['withdrawal_status'] == 1:
+                                if coin in coin_list:
+                                    print_n_log('{} withdrawal closed.'.format(coin, coin))
+                                    maedo(coin)
+                            elif api_n[coin]['withdrawal_status'] == 0:
+                                if coin in coin_list:
+                                    print_n_log('{} withdrawal opened'.format(coin))
+                                    #print_n_log('Selling {}...'.format(coin))
+                                    #maesoo(coin)
 
-            with open('./status.json','w') as f:
-                f.write(json.dumps(api_n))
-                print_n_log(msg='Suucessfully fetched deposit and withdraw status.')
-                        
-            ticker_timer = ticker_timer + 1
-            proxy_timer = proxy_timer + 1
+                with open('./status.json','w') as f:
+                    f.write(json.dumps(api_n))
+                    print_n_log(msg='Suucessfully fetched deposit and withdraw status.')
+                            
+                ticker_timer = ticker_timer + 1
+                proxy_timer = proxy_timer + 1
 
-            # Get ticker every hour
-            if ticker_timer >= 1800:
-                print_n_log('Ticker checking timer reached. Updating ticker...')
-                tickers = get_ticker()
-                ticker_timer = 0
-            # Change proxy every 10 minutes
-            if proxy_timer >= 300:
-                print_n_log('Proxy change timer reached. Changing proxy...')
-                proxy = get_working_proxy()
-                print_n_log('Proxy changed. A new proxy is: {}'.format(proxy))
-                proxy_timer = 0
+                # Get ticker every hour
+                if ticker_timer >= 1800:
+                    print_n_log('Ticker checking timer reached. Updating ticker...')
+                    tickers = get_ticker()
+                    ticker_timer = 0
+                # Change proxy every 10 minutes
+                if proxy_timer >= 300:
+                    print_n_log('Proxy change timer reached. Changing proxy...')
+                    proxy = get_working_proxy()
+                    print_n_log('Proxy changed. A new proxy is: {}'.format(proxy))
+                    proxy_timer = 0
 
-            time.sleep(2)
-        except Exception as e:
-            logging.info(e)
-            raise Exception(e)
-            break
+                time.sleep(2)
+    except Exception as e:
+        print_n_log(e)
+        asyncio.run(send_error_message("Bithumb Deposit and Withdraw Status", e))
+        raise Exception(e)
 
-#get_status()
+if __name__ == "__main__":
+    get_status()

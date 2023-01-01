@@ -1,3 +1,4 @@
+from pybithumb import Bithumb
 import sqlite3
 import os
 import json
@@ -83,6 +84,19 @@ def get_all_coins():
         return res
     except:
         return None
+def get_ticker():
+    tickers = {}
+    tickers["KRW"] = Bithumb.get_tickers('KRW')
+    tickers["BTC"] = list((btc_ticker for btc_ticker in Bithumb.get_tickers('btc') if btc_ticker not in tickers['KRW']))
+    return tickers
+def get_buy_sell_coins():
+    coin_list = []
+    for coin in get_all_coins():
+        if coin["groups"] != "":
+            (coin_list.append(*group) for group in coin["groups"].split(","))
+        else:
+            coin_list.append(coin["name"])
+    return coin_list
 def get_working_proxy():
     con = sqlite3.connect(os.path.abspath('coins.db'))
     cur = con.cursor()
@@ -356,18 +370,8 @@ coins = {
     "groups": "OGN, GLM, WOZX, TRV, OCEAN, BOBA"
     }}
 
-coin = {
-    "source": "github-release",
-    "link": "https://github.com/Bitcoin-ABC/bitcoin-abc/releases/latest",
-    "selector":"",
-    "post": "",
-    "groups": ""
-    }
-#overhaul_post(coin, "XEC")
-
-'''
-create_coins_db()
-create_xangle_swap_db()
-create_xangle_rebrand_db()
-create_proxy_db()
-'''
+if __name__ == "__main__":
+    create_coins_db()
+    create_xangle_swap_db()
+    create_xangle_rebrand_db()
+    create_proxy_db()

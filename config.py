@@ -3,10 +3,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import WebDriverException, TimeoutException
 
-# Random user agents to deceive server
-from random_user_agent.user_agent import UserAgent
-from random_user_agent.params import SoftwareName, HardwareType
-
 # FreeProxy for preventing IP ban
 from fp.fp import FreeProxy
 
@@ -22,11 +18,6 @@ def prior_setup_bs4(func):
         print_n_log("NOW WATCHING {}".format(coin['name']))
         print("-----------------------------------------")
 
-        # Configure user agent
-        software_names = [SoftwareName.CHROME.value]
-        hardware_type = [HardwareType.COMPUTER]
-        user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hardware_type)
-
         # First time setting proxy
         if get_working_proxy() is None:
             proxl = FreeProxy(rand=True).get().replace("http://", "")
@@ -34,20 +25,14 @@ def prior_setup_bs4(func):
             proxl = get_working_proxy()
 
         print_n_log("Connected to: {}".format(proxl))
-        headers = {'User-Agent': user_agent_rotator.get_random_user_agent()}
-        return func(coin, proxl, headers)
+        return func(coin, proxl)
     return inner
 def prior_setup_selenium(func):
-    def inner(coin, delay = 15):
+    def inner(coin, delay = 10):
         print("-----------------------------------------")
         print_n_log("NOW WATCHING {}".format(coin['name']))
         print("-----------------------------------------")
 
-        # Configure user agent
-        software_names = [SoftwareName.CHROME.value]
-        hardware_type = [HardwareType.COMPUTER]
-        user_agent_rotator = UserAgent(software_names=software_names, hardware_type=hardware_type)
-        agent = user_agent_rotator.get_random_user_agent()
         error_cnt = 0
 
         # First time setting proxy
@@ -61,7 +46,7 @@ def prior_setup_selenium(func):
         # Open website and handle errors
         while True:
             try:
-                driver = os_selection(proxy = proxl, user_agent = agent)
+                driver = os_selection(proxy = proxl)
                 driver.get(coin['link'])
                 WebDriverWait(driver, delay).until(EC.visibility_of_any_elements_located((By.CSS_SELECTOR, coin["selector"])))
                 write_proxy(proxl)
@@ -77,7 +62,7 @@ def prior_setup_selenium(func):
                     proxl = FreeProxy(rand=True).get().replace("http://", "")
                     print_n_log("Now connected to: {}".format(proxl))
                     error_cnt = 0
-            except WebDriverException:
+            except WebDriverException as e:
                 print_n_log("Connection with proxy failed for WebDriverException. Trying again...")
                 driver.quit()
                 error_cnt = error_cnt + 1
@@ -91,7 +76,7 @@ def prior_setup_selenium(func):
         
         return func(coin, driver, delay)
     return inner
-def os_selection(proxy, user_agent):
+def os_selection(proxy):
     chrome_options = webdriver.ChromeOptions()
     # Selenium on Linux
     if os.name == 'posix':
@@ -107,7 +92,7 @@ def os_selection(proxy, user_agent):
         chrome_options.add_experimental_option('useAutomationExtension', False)
         chrome_options.add_argument('--disable-blink-features=AutomationControlled')
         chrome_options.add_argument('--proxy-server=%s' % proxy)
-        chrome_options.add_argument(f'user-agent={user_agent}')
+        #chrome_options.add_argument(f'user-agent={user_agent}')
     # Selenium on Windows
     elif os.name == 'nt':
         chrome_options.add_argument('--headless')
