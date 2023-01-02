@@ -1,9 +1,11 @@
 from pybithumb import Bithumb
 from dotenv import load_dotenv
 from db import get_working_proxy, get_ticker, get_buy_sell_coins
+from fp.fp import FreeProxy
 from config import print_n_log
 from update import send_error_message
 
+from requests.exceptions import RetryError
 import asyncio
 import json
 import os
@@ -119,9 +121,13 @@ def get_status():
                     proxy_timer = 0
 
                 time.sleep(2)
+    except ConnectionError:
+        print_n_log("Failed to fetch api. Changing proxy and try again...")
+        proxy = FreeProxy(rand=True).get().replace("http://", "")
+        print_n_log("Now Connected to: {}".format(proxy))
     except Exception as e:
-        print_n_log(e)
         asyncio.run(send_error_message("Bithumb Deposit and Withdraw Status", e))
+        print_n_log(e)
         raise Exception(e)
 
 if __name__ == "__main__":
