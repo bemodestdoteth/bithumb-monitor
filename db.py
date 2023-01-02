@@ -344,6 +344,12 @@ coins = {
     "selector":"",
     "post": "",
     "groups": ""
+    },"ELF": {
+    "source": "github-release",
+    "link": "https://github.com/AElfProject/AElf/releases",
+    "selector":"",
+    "post": "",
+    "groups": ""
     },"KCT-7": {
     "source": "github-release",
     "link": "https://github.com/klaytn/klaytn/releases/latest",
