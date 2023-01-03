@@ -5,8 +5,8 @@ from fp.fp import FreeProxy
 from config import print_n_log
 from update import send_error_message
 
-from requests.exceptions import RetryError
 import asyncio
+import gc
 import json
 import os
 import requests
@@ -71,10 +71,7 @@ def get_status():
         headers = {"accept": "application/json"}
 
         proxy_timer = 0
-        ticker_timer = 0
         proxy = get_working_proxy()
-        #tickers = get_ticker()
-        coin_list = get_buy_sell_coins()
 
         while True:
                 response = requests.get(url,proxies={"http": proxy}, headers=headers)
@@ -91,12 +88,11 @@ def get_status():
 
                         elif api_n[coin] != api_o[coin]:
                             if api_n[coin]['withdrawal_status'] == 0:
-                            #if api_n[coin]['withdrawal_status'] == 1:
-                                if coin in coin_list:
+                                if coin in get_buy_sell_coins():
                                     print_n_log('{} withdrawal closed.'.format(coin, coin))
                                     maedo(coin)
                             elif api_n[coin]['withdrawal_status'] == 0:
-                                if coin in coin_list:
+                                if coin in get_buy_sell_coins():
                                     print_n_log('{} withdrawal opened'.format(coin))
                                     #print_n_log('Selling {}...'.format(coin))
                                     #maesoo(coin)
@@ -104,15 +100,10 @@ def get_status():
                 with open('./status.json','w') as f:
                     f.write(json.dumps(api_n))
                     print_n_log(msg='Suucessfully fetched deposit and withdraw status.')
-                            
-                ticker_timer = ticker_timer + 1
+
+                gc.collect()
                 proxy_timer = proxy_timer + 1
 
-                # Get ticker every hour
-                if ticker_timer >= 1800:
-                    print_n_log('Ticker checking timer reached. Updating ticker...')
-                    tickers = get_ticker()
-                    ticker_timer = 0
                 # Change proxy every 10 minutes
                 if proxy_timer >= 300:
                     print_n_log('Proxy change timer reached. Changing proxy...')

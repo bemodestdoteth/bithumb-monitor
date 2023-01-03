@@ -34,6 +34,7 @@ def prior_setup_selenium(func):
         print("-----------------------------------------")
 
         error_cnt = 0
+        driver = ""
 
         # First time setting proxy
         if get_working_proxy() is None:
@@ -53,7 +54,8 @@ def prior_setup_selenium(func):
                 break
             except TimeoutException:
                 print_n_log("Connection with proxy failed for TimeoutException. Trying again...")
-                driver.quit()
+                if driver != "":
+                    driver.quit()
                 error_cnt = error_cnt + 1
                 if error_cnt >= 3:
                     print_n_log("Changing proxy due to concurrent errors...")
@@ -63,8 +65,10 @@ def prior_setup_selenium(func):
                     print_n_log("Now connected to: {}".format(proxl))
                     error_cnt = 0
             except WebDriverException as e:
+                print (e)
                 print_n_log("Connection with proxy failed for WebDriverException. Trying again...")
-                driver.quit()
+                if driver != "":
+                    driver.quit()
                 error_cnt = error_cnt + 1
                 if error_cnt >= 3:
                     print_n_log("Changing proxy due to concurrent errors...")
