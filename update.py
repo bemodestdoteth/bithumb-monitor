@@ -58,7 +58,7 @@ async def send_message(update_info):
     chat_id = os.environ['TELEGRAM_CHAT_ID']
 
     msg = '__*🔔{} has a new update\!🔔*__\n{}\n{}\n'.format(update_name, update_title, update_link)
-    await bot.sendMessage(chat_id=chat_id, text=msg, parseMode='markdownv2')
+    await bot.sendMessage(chat_id=chat_id, text=msg, parse_mode='markdownv2')
 async def send_error_message(work, msg):
     # Telegram bot configuration
     bot = telegram.Bot(token = os.environ['TELEGRAM_BOT_TOKEN'])
