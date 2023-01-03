@@ -20,6 +20,11 @@ from src.xangle.xangle_token_rebrand import xangle_token_rebrand_scrape
 
 load_dotenv()
 
+def parse_markdown_v2(msg):
+    reserved_words = ('_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!')
+    for reserved_word in reserved_words:
+        msg = msg.replace(reserved_word, "\{}".format(reserved_word))
+    return msg
 def scrape_func_selector(coin):
     try:
         if coin['source'] == "github-release":
@@ -44,22 +49,22 @@ def scrape_func_selector(coin):
         raise Exception(e)
 async def send_message(update_info):
     # Resolve reserved characters
-    update_name = update_info['name']
-    update_title = update_info['title'].replace('.', '\.').replace('-', '\-')
-    update_link = update_info['link'].replace('.', '\.').replace('-', '\-')
+    update_name = parse_markdown_v2(update_info['name'])
+    update_title = parse_markdown_v2(update_info['title'])
+    update_link = parse_markdown_v2(update_info['link'])
 
     # Telegram bot configuration
     bot = telegram.Bot(token = os.environ['TELEGRAM_BOT_TOKEN'])
     chat_id = os.environ['TELEGRAM_CHAT_ID']
 
-    msg = '🔔**{} has a new update\!**🔔\n**{}**\n**{}**\n'.format(update_name, update_title, update_link)
-    await bot.sendMessage(chat_id=chat_id, text=msg, parse_mode='markdownv2')
+    msg = '__*🔔{} has a new update\!🔔*__\n{}\n{}\n'.format(update_name, update_title, update_link)
+    await bot.sendMessage(chat_id=chat_id, text=msg, parseMode='markdownv2')
 async def send_error_message(work, msg):
     # Telegram bot configuration
     bot = telegram.Bot(token = os.environ['TELEGRAM_BOT_TOKEN'])
     chat_id = os.environ['TELEGRAM_CHAT_ID']
     
-    msg_2 = "🚫An error occurred while working on {}\!\!🚫\nmsg: {}".format(work, msg)
+    msg_2 = "__*🚫An error occurred while working on {}\!\!🚫*__\n\n{}".format(parse_markdown_v2(work), parse_markdown_v2(msg))
     await bot.sendMessage(chat_id=chat_id, text=msg_2, parse_mode='markdownv2')    
 def get_update():
     try:
