@@ -23,7 +23,7 @@ load_dotenv()
 def parse_markdown_v2(msg):
     reserved_words = ('_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!')
     for reserved_word in reserved_words:
-        msg = msg.replace(reserved_word, "\{}".format(reserved_word))
+        msg = str(msg).replace(reserved_word, "\{}".format(reserved_word))
     return msg
 def scrape_func_selector(coin):
     try:
