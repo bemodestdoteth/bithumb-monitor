@@ -9,6 +9,7 @@ import asyncio
 import gc
 import json
 import os
+from requests.exceptions import ConnectionError
 import requests
 import time
 
