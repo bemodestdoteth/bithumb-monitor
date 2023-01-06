@@ -159,6 +159,7 @@ def get_status():
                 print_n_log(msg='Keep watching deposit and withdraw status...')
 
             gc.collect()
+            file_changed = False
             proxy_timer = proxy_timer + 1
 
             # Change proxy and get new ticker every 10 minutes
