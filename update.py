@@ -59,6 +59,17 @@ async def send_message(update_info):
 
     msg = '__*🔔{} has a new update\!🔔*__\n{}\n{}\n'.format(update_name, update_title, update_link)
     await bot.sendMessage(chat_id=chat_id, text=msg, parse_mode='markdownv2')
+async def send_buy_sell_message(result, coin, price, amount):
+    # Telegram bot configuration
+    bot = telegram.Bot(token = os.environ['TELEGRAM_BOT_TOKEN'])
+    chat_id = os.environ['TELEGRAM_CHAT_ID']
+
+    # bid = buying, ask = selling
+    if result == "bid":
+        msg = '__*💸Successfully bought {}\!💸*__\nPrice: {}\nAmount: {}\n'.format(parse_markdown_v2(coin), parse_markdown_v2(price), parse_markdown_v2(amount))
+    else:
+        msg = '__*💸Successfully sold {}\!💸*__\nPrice: {}\nAmount: {}\n'.format(parse_markdown_v2(coin), parse_markdown_v2(price), parse_markdown_v2(amount))
+    await bot.sendMessage(chat_id=chat_id, text=msg, parse_mode='markdownv2')
 async def send_error_message(work, msg):
     # Telegram bot configuration
     bot = telegram.Bot(token = os.environ['TELEGRAM_BOT_TOKEN'])
