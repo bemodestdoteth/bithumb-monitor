@@ -162,15 +162,13 @@ def get_status():
             file_changed = False
             proxy_timer = proxy_timer + 1
 
-            # Change proxy and get new ticker every 10 minutes
-            if proxy_timer >= 300:
+            # Change proxy and get new ticker every 8 hours
+            if proxy_timer >= 14400:
                 print_n_log('Proxy change timer reached. Changing proxy...')
-                proxy = get_working_proxy()
-                print_n_log('Proxy changed. A new proxy is: {}'.format(proxy))
-                btc_market_coin = get_ticker()["BTC"]
-                
+                proxy = FreeProxy(rand=True).get().replace("http://", "")
+                print_n_log("Now Connected to: {}".format(proxy))
+                btc_market_coin = get_ticker()["BTC"]              
                 proxy_timer = 0
-
             time.sleep(2)
         except ConnectionError:
             asyncio.run(send_error_message("Bithumb Deposit and Withdraw Status", "Failed to fetch api. Changing proxy and try again..."))
