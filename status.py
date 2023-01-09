@@ -139,6 +139,7 @@ def get_status():
                 with open('./status.json','r') as f:
                     print_n_log(msg='Renewing api_o file since deposit and withdraw status has renewed...')
                     api_o = json.loads(f.readline())
+                    file_changed = False
 
             # Get new data from Bithumb API
             api_n = json.loads(requests.get(url ,proxies={"http": proxy}, headers=headers).text)['data']
@@ -150,7 +151,6 @@ def get_status():
                     elif api_n[coin] != api_o[coin] and api_n[coin]['withdrawal_status'] == 0:
                         print_n_log('{} withdrawal closed.'.format(coin, coin))
                         maedo(coin, btc_market_coin)
-
                 with open('./status.json','w') as f:
                     f.write(json.dumps(api_n))
                     file_changed = True
@@ -159,7 +159,6 @@ def get_status():
                 print_n_log(msg='Keep watching deposit and withdraw status...')
 
             gc.collect()
-            file_changed = False
             proxy_timer = proxy_timer + 1
 
             # Change proxy and get new ticker every 8 hours
