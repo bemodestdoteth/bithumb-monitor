@@ -20,15 +20,15 @@ def prior_setup_bs4(func):
 
         # First time setting proxy
         if get_working_proxy() is None:
-            proxl = FreeProxy(rand=True, https=True).get().replace("http://", "")
+            proxl = FreeProxy(rand=True).get().replace("http://", "")
         else:
             proxl = get_working_proxy()
 
-        print_n_log("Connected to: {}".format(proxl))
+        print_n_log("Connected to: {}".format(proxl))        
         return func(coin, proxl)
     return inner
 def prior_setup_selenium(func):
-    def inner(coin, delay = 30):
+    def inner(coin, delay = 15):
         print("-----------------------------------------")
         print_n_log("NOW WATCHING {}".format(coin['name']))
         print("-----------------------------------------")
@@ -36,17 +36,15 @@ def prior_setup_selenium(func):
         error_cnt = 0
         driver = ""
 
-        proxl = "185.199.229.156:7492"
-        print_n_log("Connected to: {}".format(proxl))
+        #proxl = "185.199.229.156:7492"
+        #print_n_log("Connected to: {}".format(proxl))
         # First time setting proxy
-        '''
         if get_working_proxy() is None:
-            proxl = FreeProxy(rand=True, https=True).get().replace("http://", "")
+            proxl = FreeProxy(rand=True).get().replace("http://", "")
             print_n_log("Connected to: {}".format(proxl))
         else:
             proxl = get_working_proxy()
             print_n_log("Connected to: {}".format(proxl))
-        '''
 
         # Open website and handle errors
         while True:
@@ -65,7 +63,7 @@ def prior_setup_selenium(func):
                     print_n_log("Changing proxy due to concurrent errors...")
                     delete_proxy(proxl)
                     
-                    proxl = FreeProxy(rand=True, https=True).get().replace("http://", "")
+                    proxl = FreeProxy(rand=True).get().replace("http://", "")
                     print_n_log("Now connected to: {}".format(proxl))
                     error_cnt = 0
             except WebDriverException as e:
@@ -78,9 +76,9 @@ def prior_setup_selenium(func):
                     print_n_log("Changing proxy due to concurrent errors...")
                     delete_proxy(proxl)
                     
-                    proxl = FreeProxy(rand=True, https=True).get().replace("http://", "")
+                    proxl = FreeProxy(rand=True).get().replace("http://", "")
                     print_n_log("Now connected to: {}".format(proxl))
-                    error_cnt = 0
+                    error_cnt = 0            
         
         return func(coin, driver, delay)
     return inner
@@ -89,8 +87,9 @@ def os_selection(proxy):
     # Selenium on Linux
     if os.name == 'posix':
         # Bypass headless block
+        user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36"
         chrome_options.page_load_strategy = "eager"
-        #chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--headless')
         chrome_options.add_argument("--incognito")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument('--disable-gpu')
@@ -101,7 +100,7 @@ def os_selection(proxy):
         chrome_options.add_experimental_option('useAutomationExtension', False)
         chrome_options.add_argument('--disable-blink-features=AutomationControlled')
         chrome_options.add_argument('--proxy-server=%s' % proxy)
-        #chrome_options.add_argument(f'user-agent={user_agent}')
+        chrome_options.add_argument(f'user-agent={user_agent}')
     # Selenium on Windows
     elif os.name == 'nt':
         chrome_options.add_argument('--headless')
