@@ -20,7 +20,7 @@ def prior_setup_bs4(func):
 
         # First time setting proxy
         if get_working_proxy() is None:
-            proxl = FreeProxy(rand=True).get().replace("http://", "")
+            proxl = FreeProxy(rand=True, https=True).get().replace("http://", "")
         else:
             proxl = get_working_proxy()
 
@@ -38,7 +38,7 @@ def prior_setup_selenium(func):
 
         # First time setting proxy
         if get_working_proxy() is None:
-            proxl = FreeProxy(rand=True).get().replace("http://", "")
+            proxl = FreeProxy(rand=True, https=True).get().replace("http://", "")
             print_n_log("Connected to: {}".format(proxl))
         else:
             proxl = get_working_proxy()
@@ -61,7 +61,7 @@ def prior_setup_selenium(func):
                     print_n_log("Changing proxy due to concurrent errors...")
                     delete_proxy(proxl)
                     
-                    proxl = FreeProxy(rand=True).get().replace("http://", "")
+                    proxl = FreeProxy(rand=True, https=True).get().replace("http://", "")
                     print_n_log("Now connected to: {}".format(proxl))
                     error_cnt = 0
             except WebDriverException as e:
@@ -74,7 +74,7 @@ def prior_setup_selenium(func):
                     print_n_log("Changing proxy due to concurrent errors...")
                     delete_proxy(proxl)
                     
-                    proxl = FreeProxy(rand=True).get().replace("http://", "")
+                    proxl = FreeProxy(rand=True, https=True).get().replace("http://", "")
                     print_n_log("Now connected to: {}".format(proxl))
                     error_cnt = 0
         
