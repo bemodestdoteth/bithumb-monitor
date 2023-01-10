@@ -34,4 +34,5 @@ def xangle_scrape(coin, driver, delay):
         return latest_proposal
 
 # Testing code
-#xangle_scrape(get_coin("ETC"))
+if __name__ == "__main__":
+    xangle_scrape(get_coin("ETC"))

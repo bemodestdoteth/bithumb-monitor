@@ -42,7 +42,7 @@ def prior_setup_selenium(func):
             print_n_log("Connected to: {}".format(proxl))
         else:
             proxl = get_working_proxy()
-            print_n_log("Connected to: {}".format(proxl))
+            print_n_log("Connected to: {}".format(proxl))        
 
         # Open website and handle errors
         while True:
@@ -111,6 +111,7 @@ def os_selection(proxy):
         Preserve user cookies
         t.ly/uDkv
         '''
+    webdriver.DesiredCapabilities.CHROME['acceptSslCerts']=True
     driver = webdriver.Chrome(options=chrome_options)
     return driver
 def update_chromedriver():
