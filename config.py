@@ -28,7 +28,7 @@ def prior_setup_bs4(func):
         return func(coin, proxl)
     return inner
 def prior_setup_selenium(func):
-    def inner(coin, delay = 10):
+    def inner(coin, delay = 30):
         print("-----------------------------------------")
         print_n_log("NOW WATCHING {}".format(coin['name']))
         print("-----------------------------------------")
@@ -36,13 +36,17 @@ def prior_setup_selenium(func):
         error_cnt = 0
         driver = ""
 
+        proxl = "185.199.229.156:7492"
+        print_n_log("Connected to: {}".format(proxl))
         # First time setting proxy
+        '''
         if get_working_proxy() is None:
             proxl = FreeProxy(rand=True, https=True).get().replace("http://", "")
             print_n_log("Connected to: {}".format(proxl))
         else:
             proxl = get_working_proxy()
-            print_n_log("Connected to: {}".format(proxl))        
+            print_n_log("Connected to: {}".format(proxl))
+        '''
 
         # Open website and handle errors
         while True:
@@ -85,7 +89,8 @@ def os_selection(proxy):
     # Selenium on Linux
     if os.name == 'posix':
         # Bypass headless block
-        chrome_options.add_argument('--headless')
+        chrome_options.page_load_strategy = "eager"
+        #chrome_options.add_argument('--headless')
         chrome_options.add_argument("--incognito")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument('--disable-gpu')
