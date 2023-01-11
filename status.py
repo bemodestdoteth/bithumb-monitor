@@ -122,7 +122,7 @@ def get_status():
     url = "https://api.bithumb.com/public/assetsstatus/ALL"
     headers = {"accept": "application/json"}
 
-    # Initialize variables
+    # Initialize
     file_changed = False
     proxy_timer = 0
     proxy = get_working_proxy()
@@ -169,8 +169,8 @@ def get_status():
                 btc_market_coin = get_ticker()["BTC"]              
                 proxy_timer = 0
             time.sleep(2)
-        except ConnectionError:
-            asyncio.run(send_error_message("Bithumb Deposit and Withdraw Status", "Failed to fetch api. Changing proxy and try again..."))
+        except ConnectionError as e:
+            asyncio.run(send_error_message("Bithumb Deposit and Withdraw Status", "Failed to fetch api. Changing proxy and try again...\n\nDetailed message: {}".format(e)))
             print_n_log("Failed to fetch api. Changing proxy and try again...")
             proxy = FreeProxy(rand=True).get().replace("http://", "")
             print_n_log("Now Connected to: {}".format(proxy))
